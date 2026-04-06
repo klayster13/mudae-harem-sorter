@@ -6,7 +6,7 @@ Drag and drop to reorder, lock your favorites at the top, search by character or
 
 <img width="2548" height="1305" alt="image" src="https://github.com/user-attachments/assets/c46a5e7e-201c-42c0-97e3-76e1aee64d24" />
 
-## 🚀 Live Version
+## 🚀 Live Version (currently buggy, recommend downloading and running directly on your browser for now)
 
 **[Open Mudae Harem Sorter]** https://klayster13.github.io/mudae-harem-sorter/
 
