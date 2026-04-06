@@ -10,56 +10,45 @@ Drag and drop to reorder, lock your favorites at the top, search by character or
 
 **[Open Mudae Harem Sorter]** https://klayster13.github.io/mudae-harem-sorter/
 
-## Features
-- Paste Mudae export (`$mmak-i-s` or `$mmaki-s`)
-- Drag & drop reordering with locked characters pinned at the top
-- Per-card controls (↑ ↓ SERIES Lock/Unlock)
-- Bulk move by series
-- Multiple sort options (Name, Series, Kakera, Shuffle Unlocked)
-- Search by character or series
-- Auto-save to browser + manual Save/Load JSON backups
-- Generates properly split `$sm` / `$smpos` commands for Discord
-- Clean monochrome UI with accent color
+### Features
 
-## Changelog
+- **Import from Mudae** – Supports `$mmak-i-s` and `$mmaki-s` exports.
+- **Add new characters to existing list** (v1.2.0+) – Paste a new export and choose to add only the new waifus to the bottom without losing your current order or locks.
+- **Drag & Drop** – Reorder freely. Locked characters stay pinned at the top.
+- **Locking System** – Lock any character + everything above it. Unlock any character + everything below it.
+- **Per-Card Controls** – ↑ (move to locked section), ↓ (move to bottom), SERIES (move all from same series), Lock/Unlock.
+- **Smart Sorting** – Sort by Name (A-Z / Z-A), Series, or Kakera (High→Low / Low→High).
+- **Shuffle Unlocked** – Randomize only the unlocked portion.
+- **Search** – Instantly jump to a character or series.
+- **Navigation Sidebar** – Quick jumps to Top, End of Locked, Bottom, Return to Last Position, or $sm Output.
+- **Ctrl + Click** – Copy any character name to clipboard.
+- **$sm Command Generation** – Automatically splits long lists and chains with `$smpos` for easy Discord pasting.
+- **Save / Load** – Automatic browser save + manual JSON backup / restore.
+- **Fully Offline** – Single HTML file, no server needed.
 
-### v1.1test (Current)
-**Date:** April 2026  
-**Changes from v1.0:**
-- Added full save system:
-  - Automatic localStorage saving after every change (import, drag, lock, sort, etc.)
-  - Manual **Save** button with custom filename popup
-  - **Load** button supporting both file upload and JSON paste
-- Updated top bar layout:
-  - Simplified button labels (`Import Harem` → `Import`, `Load Save` → `Load`, `Generate $sm` → `$sm`)
-  - Reordered buttons so **Help** is now at the far right
-- Replaced monochrome description with clear **v1.1test** version indicator
-- Added Content-Security-Policy meta tag to improve external image loading on GitHub Pages
-- Expanded Help modal with a new **Save System** section at the top
+### How to Use
 
-### v1.0 (Initial Release)
-- Core functionality: Import, drag & drop grid, locking, per-card controls, sorting, search, series bulk move, command generation
-- Sidebars for navigation and sorting
-- Slim top bar and clean monochrome design
-- Auto-open help modal on first load
+1. Download `index.html` from the repo.
+2. Open the file in any browser (Chrome/Firefox/Edge recommended).
+3. In Mudae, run `$mmak-i-s` (or `$mmaki-s` for key kakera) and copy the entire export thread.
+4. Click **📥 Import**, paste the text, and click Import.
+   - First time → normal import.
+   - Later imports → choose **"Add new characters to bottom"** to keep your arrangement.
+5. Drag, lock, sort, and organize as you like.
+6. Click **📋 $sm** to generate commands you can paste directly into Discord.
+7. Your progress is auto-saved. Use **💾 Save** for a backup file.
 
-## How to Use
-1. Go to your GitHub Pages URL
-2. Click **Import** and paste your Mudae export (`$mmak-i-s` or `$mmaki-s`)
-3. Drag cards to reorder, use per-card buttons to lock/move
-4. Use right sidebar to sort or shuffle
-5. Click **$sm** to generate ready-to-paste Discord commands
-6. Use **Save** / **Load** to backup or restore your sorted harem
+**Tip:** Use the left navigation and right sort bar for fast movement.
 
-## Local Development
-- Download `index.html`
-- Open the file directly in your browser (double-click)
+### Thanks for using dealio!
 
-## Contributing / Feedback
-Feel free to open issues or pull requests on the repository.
+Huge thanks for using the Mudae Harem Sorter!  
+This tool was built step-by-step with you, and it's genuinely awesome to see it helping manage your harem so cleanly.
+
+If you have feedback, new feature ideas, or find any bugs, just let me know — I'm always happy to improve it.
+
+Enjoy your perfectly organized harem! ❤️
 
 ---
-
-Made with ❤️ for the Mudae community.
 
 If you enjoy this tool, feel free to star the repository ⭐
