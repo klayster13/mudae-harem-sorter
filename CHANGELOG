@@ -1,0 +1,51 @@
+# Changelog
+
+All notable changes to the Mudae Harem Sorter will be documented in this file.
+
+## [1.2.0] - 2026-04-06
+### Added
+- New import option: **"Add new characters to bottom"** – when a list already exists, you now get a choice between "Replace entire list" or "Add new characters to bottom". Only new characters (deduplicated by name) are appended, preserving your current order, locks, and arrangement.
+- Auto-clear of the import textarea after successful import (both Replace and Add).
+- Toast notifications for clearer feedback on import actions.
+- Dedicated section in the Help modal explaining how to import new characters to an existing list.
+- Ctrl + Click on any card now copies the character name to clipboard (already present in v1.1test but now documented).
+
+### Fixed
+- Help button now works correctly.
+- Clear button now fully clears the list and UI.
+- Jump to Bottom button now scrolls to the actual bottom of the grid (not the $sm output section).
+
+### Changed
+- Version bumped to 1.2.0.
+- Help modal updated with new import instructions.
+
+## [1.1test] - 2026-04 (pre-1.2.0)
+### Added
+- Full save/load system (auto localStorage + manual JSON download/upload + paste import).
+- Slim top bar with uniform buttons.
+- Fixed sidebars at 775px offset from center.
+- Ctrl + Click to copy character name to clipboard.
+- Position counters on every card (x/y).
+- Note display as green pills under kakera.
+- Search bar that supports character and series search.
+- Navigation sidebar (To Top, End of Locked, To Bottom, Return to Last Position, Jump to Output).
+- Improved $sm command generation with proper $smpos chaining and per-box copy buttons.
+
+### Fixed
+- Series detection (DANMACHI special case and long titles).
+- Various layout and button alignment issues from earlier iterations.
+
+## [1.0] - Initial Stable Release
+### Added
+- Core Mudae export parser ($mmak-i-s / $mmaki-s support).
+- Drag & drop grid with locked section pinning.
+- Per-card controls (↑ ↓ SERIES Lock/Unlock).
+- Sorting by Name, Series, Kakera (with reverse on second click).
+- Shuffle Unlocked.
+- $sm command generation with automatic splitting.
+- Help modal with full instructions.
+- Basic save system foundation.
+
+---
+
+**Thank you for using Mudae Harem Sorter!**
