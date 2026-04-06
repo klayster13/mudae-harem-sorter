@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mudae Harem Sorter</title>
   
-  <!-- This helps external images load on GitHub Pages -->
   <meta http-equiv="Content-Security-Policy" content="img-src * data: https:;">
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -249,7 +248,7 @@
       </div>
     </div>
 
-    <!-- Help Modal -->
+    <!-- Help Modal - Your original full version restored -->
     <div id="helpBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
       <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-3xl w-full mx-4 border border-[#2a2a2a] max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
@@ -276,12 +275,8 @@
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">3.</span> Importing New Characters</h3>
-            <p class="text-[#cccccc]">• First import creates your list normally.<br>
-            • Subsequent imports will show a choice:<br>
-            &nbsp;&nbsp;• <strong>Replace entire list</strong> – Clears everything and starts fresh.<br>
-            &nbsp;&nbsp;• <strong>Add new characters to bottom</strong> – Keeps your current order, locks, and arrangement. Only adds characters that aren't already in your list.<br>
-            This makes it easy to keep your sorted harem up-to-date as you claim more waifus without losing your work.</p>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">3.</span> Importing</h3>
+            <p class="text-[#cccccc]">Click <strong>📥 Import</strong>, paste the full export, and click Import.</p>
           </div>
 
           <div>
@@ -300,6 +295,7 @@
               <li><strong>Sort by Kakera</strong> – First click: High to Low • Second click: Low to High</li>
               <li><strong>Shuffle Unlocked</strong> – Randomly shuffles only the unlocked characters (locked ones stay at the top).</li>
             </ul>
+            <p class="text-sm text-[#aaaaaa] mt-2">Clicking a different sort button resets to its normal order.</p>
           </div>
 
           <div>
@@ -315,14 +311,18 @@
 
           <div>
             <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">7.</span> Navigation Sidebar</h3>
-            <p class="text-[#cccccc]">Left sidebar buttons let you quickly jump around.</p>
+            <p class="text-[#cccccc]">Left sidebar buttons let you quickly jump around:</p>
+            <ul class="list-disc pl-6 text-[#cccccc]">
+              <li><strong>↑ Go to Top</strong>, <strong>🔒 End of Locked</strong>, <strong>↓ Go to Bottom</strong></li>
+              <li><strong>↩ Return to Last Position</strong> – Jumps back to the exact scroll position you were at before using any other navigation button.</li>
+              <li><strong>📜 Jump to Output</strong></li>
+            </ul>
           </div>
 
           <div>
             <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">8.</span> Other Features</h3>
             <p class="text-[#cccccc]">• Drag cards to reorder freely (locked cards stay pinned at top).<br>
-            • <strong>🔓 Unlock All</strong> removes all locks.<br>
-            • Ctrl + Click on any card copies the character name to clipboard.</p>
+            • <strong>🔓 Unlock All</strong> removes all locks.</p>
           </div>
 
           <div>
@@ -556,7 +556,6 @@
       return parsed;
     }
 
-    // ====================== ORIGINAL doImport (unchanged) ======================
     function doImport(text) {
       characters = [];
       let currentSeries = "Unknown";
