@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mudae Harem Sorter</title>
+  
+  <!-- This helps external images load on GitHub Pages -->
+  <meta http-equiv="Content-Security-Policy" content="img-src * data: https:;">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <style>
@@ -63,21 +67,20 @@
       z-index: 80;
       background-color: #111113;
       border-bottom: 1px solid #2a2a2a;
-      padding: 0.55rem 1.5rem;
-      margin: -1.5rem -1.5rem 1.25rem;
+      padding: 0.55rem 1.25rem;
     }
 
     .top-btn {
-      min-width: 140px;
-      height: 42px;
+      min-width: 92px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
       white-space: nowrap;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
-      padding: 0 16px;
+      padding: 0 14px;
       border-radius: 9999px;
     }
 
@@ -121,18 +124,20 @@
       <div class="flex justify-between items-center gap-4">
         <div class="flex-shrink-0">
           <h1 class="text-3xl font-bold tracking-tight whitespace-nowrap">Mudae Harem Sorter</h1>
-          <p class="text-sm text-gray-400">Monochrome • Drag &amp; reorder your waifus</p>
+          <p class="text-sm text-gray-400">v1.1test</p>
         </div>
         
-        <div class="flex items-center gap-3 flex-1 justify-end">
+        <div class="flex items-center gap-3 flex-1 justify-end flex-wrap">
           <input id="searchInput" type="text" placeholder="Search character or series..." 
                  onkeypress="if(event.key === 'Enter') searchCharacter()"
                  class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl px-5 py-2.5 text-white w-72 focus:outline-none focus:border-[#57bb8a]">
 
-          <button onclick="showImportBox()" class="top-btn accent-btn">📥 Import Harem</button>
-          <button onclick="generateCommands()" class="top-btn accent-btn">📋 Generate $sm</button>
-          <button onclick="showHelp()" class="top-btn accent-btn">❔ Help</button>
+          <button onclick="showImportBox()" class="top-btn accent-btn">📥 Import</button>
+          <button onclick="showSaveImportBox()" class="top-btn accent-btn">📂 Load</button>
+          <button onclick="showSavePopup()" class="top-btn accent-btn">💾 Save</button>
+          <button onclick="generateCommands()" class="top-btn accent-btn">📋 $sm</button>
           <button onclick="clearAll()" class="top-btn accent-btn">🗑️ Clear</button>
+          <button onclick="showHelp()" class="top-btn accent-btn">❔ Help</button>
         </div>
       </div>
     </div>
@@ -180,6 +185,37 @@
       </div>
     </div>
 
+    <!-- Save Import Modal -->
+    <div id="saveImportBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-lg w-full mx-4 border border-[#2a2a2a]">
+        <h2 class="text-2xl font-semibold mb-6">Import Save</h2>
+        <div class="border-2 border-dashed border-[#2a2a2a] rounded-2xl p-8 text-center mb-6">
+          <input type="file" id="saveFileInput" accept=".json" class="hidden" onchange="handleSaveFileUpload(event)">
+          <button onclick="document.getElementById('saveFileInput').click()" class="accent-btn px-8 py-3 rounded-2xl">Choose .json File</button>
+        </div>
+        <textarea id="savePasteText" rows="8" placeholder="Or paste JSON here..." class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl p-6 font-mono text-sm resize-y"></textarea>
+        <div class="flex gap-4 mt-6">
+          <button onclick="importSaveFromPaste()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Import from Paste</button>
+          <button onclick="hideSaveImportBox()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save Popup -->
+    <div id="savePopup" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+      <div class="bg-[#1a1a1a] rounded-3xl p-8 w-full max-w-md border border-[#2a2a2a]">
+        <h2 class="text-2xl font-semibold mb-6">Save Harem</h2>
+        <div class="mb-6">
+          <label class="block text-sm text-gray-400 mb-2">Filename</label>
+          <input id="saveFilename" type="text" class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-[#57bb8a]">
+        </div>
+        <div class="flex gap-4">
+          <button onclick="performSave()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Download Save</button>
+          <button onclick="hideSavePopup()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Help Modal -->
     <div id="helpBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
       <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-3xl w-full mx-4 border border-[#2a2a2a] max-h-[90vh] overflow-y-auto">
@@ -190,7 +226,14 @@
 
         <div class="space-y-8 text-white">
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">1.</span> Getting Your Export from Mudae</h3>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">1.</span> Save System</h3>
+            <p class="text-[#cccccc]">• <strong>Auto Save</strong>: Every change (drag, lock, sort, import) is automatically saved to your browser.<br>
+            • <strong>Save</strong>: Click to choose a filename and download a backup JSON file.<br>
+            • <strong>Load</strong>: Restore a previous save (choose file or paste JSON).</p>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">2.</span> Getting Your Export from Mudae</h3>
             <p class="text-[#cccccc]">In Mudae, type one of these commands to generate a clean export thread:</p>
             <ul class="list-disc pl-6 mt-2 text-[#cccccc]">
               <li><code class="bg-[#111113] px-2 py-0.5 rounded">$mmak-i-s</code> → Use this for base kakera values</li>
@@ -200,19 +243,19 @@
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">2.</span> Importing</h3>
-            <p class="text-[#cccccc]">Click <strong>📥 Import Harem</strong>, paste the full export, and click Import.</p>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">3.</span> Importing</h3>
+            <p class="text-[#cccccc]">Click <strong>📥 Import</strong>, paste the full export, and click Import.</p>
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">3.</span> Search</h3>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">4.</span> Search</h3>
             <p class="text-[#cccccc]">Type a character name or series name in the top bar and press Enter.<br>
             • Character search jumps to that character.<br>
             • Series search jumps to the highest character from that series in your current list.</p>
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">4.</span> Sorting</h3>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">5.</span> Sorting</h3>
             <p class="text-[#cccccc]">Use the buttons on the right sidebar:</p>
             <ul class="list-disc pl-6 text-[#cccccc]">
               <li><strong>Sort by Name</strong> – First click: A-Z • Second click: Z-A</li>
@@ -224,7 +267,7 @@
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">5.</span> Per-Card Controls</h3>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">6.</span> Per-Card Controls</h3>
             <ul class="list-disc pl-6 text-[#cccccc]">
               <li><strong>↑</strong> – Move to bottom of locked section</li>
               <li><strong>↓</strong> – Move to very bottom</li>
@@ -235,7 +278,7 @@
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">6.</span> Navigation Sidebar</h3>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">7.</span> Navigation Sidebar</h3>
             <p class="text-[#cccccc]">Left sidebar buttons let you quickly jump around:</p>
             <ul class="list-disc pl-6 text-[#cccccc]">
               <li><strong>↑ Go to Top</strong>, <strong>🔒 End of Locked</strong>, <strong>↓ Go to Bottom</strong></li>
@@ -245,14 +288,14 @@
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">7.</span> Other Features</h3>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">8.</span> Other Features</h3>
             <p class="text-[#cccccc]">• Drag cards to reorder freely (locked cards stay pinned at top).<br>
             • <strong>🔓 Unlock All</strong> removes all locks.</p>
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">8.</span> Generate Commands</h3>
-            <p class="text-[#cccccc]">Click <strong>📋 Generate $sm Commands</strong> to create ready-to-paste Discord commands (automatically split and chained with $smpos).</p>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">9.</span> Generate Commands</h3>
+            <p class="text-[#cccccc]">Click <strong>📋 $sm</strong> to create ready-to-paste Discord commands (automatically split and chained with $smpos).</p>
           </div>
         </div>
 
@@ -274,6 +317,99 @@
     let lockedCount = 0;
     let currentSort = { field: null, direction: 'asc' };
     let lastScrollY = 0;
+    const SAVE_KEY = 'mudaeHaremSave';
+
+    // ====================== SAVE SYSTEM ======================
+    function saveToLocalStorage() {
+      try {
+        const saveData = { version: "1.0-save", timestamp: Date.now(), lockedCount, characters };
+        localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+      } catch (e) { console.warn("Auto-save failed", e); }
+    }
+
+    function loadFromLocalStorage() {
+      try {
+        const saved = localStorage.getItem(SAVE_KEY);
+        if (!saved) return false;
+        const data = JSON.parse(saved);
+        if (data.characters && Array.isArray(data.characters)) {
+          characters = data.characters;
+          lockedCount = Math.min(data.lockedCount || 0, characters.length);
+          return true;
+        }
+      } catch (e) { console.warn("Load failed", e); }
+      return false;
+    }
+
+    function showSavePopup() {
+      const date = new Date().toISOString().slice(0,10);
+      document.getElementById('saveFilename').value = `mudae-harem-save-${date}.json`;
+      document.getElementById('savePopup').classList.remove('hidden');
+    }
+
+    function hideSavePopup() {
+      document.getElementById('savePopup').classList.add('hidden');
+    }
+
+    function performSave() {
+      let filename = document.getElementById('saveFilename').value.trim();
+      if (!filename) filename = `mudae-harem-save-${new Date().toISOString().slice(0,10)}.json`;
+      if (!characters.length) {
+        alert("Nothing to save.");
+        hideSavePopup();
+        return;
+      }
+      const saveData = { version: "1.0-save", timestamp: Date.now(), lockedCount, characters };
+      const blob = new Blob([JSON.stringify(saveData, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+      hideSavePopup();
+    }
+
+    function showSaveImportBox() {
+      document.getElementById('saveImportBox').classList.remove('hidden');
+      document.getElementById('savePasteText').value = '';
+    }
+    function hideSaveImportBox() { document.getElementById('saveImportBox').classList.add('hidden'); }
+
+    function handleSaveFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (data.characters && Array.isArray(data.characters)) {
+            characters = data.characters;
+            lockedCount = Math.min(data.lockedCount || 0, characters.length);
+            renderGrid();
+            saveToLocalStorage();
+            hideSaveImportBox();
+            alert(`✅ Loaded ${characters.length} characters from save.`);
+          }
+        } catch (err) { alert("Invalid save file."); }
+      };
+      reader.readAsText(file);
+    }
+
+    function importSaveFromPaste() {
+      const text = document.getElementById('savePasteText').value.trim();
+      if (!text) return alert("Paste save data first.");
+      try {
+        const data = JSON.parse(text);
+        if (data.characters && Array.isArray(data.characters)) {
+          characters = data.characters;
+          lockedCount = Math.min(data.lockedCount || 0, characters.length);
+          renderGrid();
+          saveToLocalStorage();
+          hideSaveImportBox();
+          alert(`✅ Loaded ${characters.length} characters from paste.`);
+        }
+      } catch { alert("Invalid JSON."); }
+    }
+    // ====================== END SAVE SYSTEM ======================
 
     function showImportBox() { document.getElementById('importBox').classList.remove('hidden'); }
     function hideImportBox() { document.getElementById('importBox').classList.add('hidden'); }
@@ -285,6 +421,7 @@
         characters = []; lockedCount = 0; currentSort = { field: null, direction: 'asc' };
         document.getElementById('grid').innerHTML = '';
         document.getElementById('commandsOutput').classList.add('hidden');
+        saveToLocalStorage();
       }
     }
 
@@ -292,6 +429,7 @@
       if (confirm("Unlock ALL characters?")) {
         lockedCount = 0;
         renderGrid();
+        saveToLocalStorage();
       }
     }
 
@@ -324,13 +462,11 @@
 
       const cards = Array.from(document.querySelectorAll('#grid > div'));
 
-      // 1. Exact character name match
       let bestCard = cards.find(card => {
         const name = card.querySelector('.font-semibold').textContent.trim().toLowerCase();
         return name === query;
       });
 
-      // 2. Whole-word character name match
       if (!bestCard) {
         bestCard = cards.find(card => {
           const name = card.querySelector('.font-semibold').textContent.trim().toLowerCase();
@@ -338,7 +474,6 @@
         });
       }
 
-      // 3. Partial character name match
       if (!bestCard) {
         bestCard = cards.find(card => {
           const name = card.querySelector('.font-semibold').textContent.trim().toLowerCase();
@@ -346,13 +481,11 @@
         });
       }
 
-      // 4. Series match - find the highest (first) character from that series
       if (!bestCard) {
         bestCard = cards.find(card => {
           const seriesEl = card.querySelector('.text-sm');
           if (!seriesEl) return false;
           const seriesText = seriesEl.textContent.toLowerCase();
-          // More forgiving series search
           return seriesText.includes(query) || 
                  query.split(' ').every(word => seriesText.includes(word));
         });
@@ -431,6 +564,7 @@
       lockedCount = 0;
       hideImportBox();
       renderGrid();
+      saveToLocalStorage();
       alert(`✅ Imported ${characters.length} waifus!`);
     }
 
@@ -477,6 +611,7 @@
           }).filter(Boolean);
           characters = newOrder;
           renderGrid();
+          saveToLocalStorage();
         }
       });
     }
@@ -490,6 +625,7 @@
       }
       characters = [...characters.slice(0, lockedCount), ...unlocked];
       renderGrid();
+      saveToLocalStorage();
     }
 
     function sortByName() {
@@ -525,6 +661,7 @@
 
       characters = [...characters.slice(0, lockedCount), ...unlocked];
       renderGrid();
+      saveToLocalStorage();
     }
 
     function moveSeriesToLocked(seriesName) {
@@ -536,6 +673,7 @@
       characters = characters.filter((c, idx) => !(idx >= lockedCount && c.series === seriesName));
       characters.splice(lockedCount, 0, ...unlockedSeriesChars);
       renderGrid();
+      saveToLocalStorage();
     }
 
     function moveUp(index) {
@@ -543,6 +681,7 @@
       const char = characters.splice(index, 1)[0];
       characters.splice(lockedCount, 0, char);
       renderGrid();
+      saveToLocalStorage();
     }
 
     function moveDown(index) {
@@ -550,6 +689,7 @@
       const char = characters.splice(index, 1)[0];
       characters.push(char);
       renderGrid();
+      saveToLocalStorage();
     }
 
     function toggleLock(name) {
@@ -557,6 +697,7 @@
       if (idx === -1) return;
       lockedCount = (idx < lockedCount) ? idx : idx + 1;
       renderGrid();
+      saveToLocalStorage();
     }
 
     function generateCommands() {
@@ -614,6 +755,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      if (loadFromLocalStorage()) {
+        renderGrid();
+      }
       showHelp();
     });
   </script>
