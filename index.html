@@ -411,9 +411,9 @@
     }
     // ====================== END SAVE SYSTEM ======================
 
-    // CORS Proxy helper (minimal addition for GitHub Pages image loading)
+    // CORS Proxy helper - using a different proxy
     function proxyImage(url) {
-      return `https://corsproxy.io/?` + encodeURIComponent(url);
+      return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
     }
 
     function showImportBox() { document.getElementById('importBox').classList.remove('hidden'); }
@@ -560,7 +560,7 @@
             name: name,
             note: note,
             series: currentSeries,
-            imageUrl: urlMatch[1],           // keep original URL in data
+            imageUrl: urlMatch[1],
             kakera: parseInt(kakeraMatch[1].replace(/,/g, ''))
           });
         }
@@ -585,7 +585,7 @@
         
         card.innerHTML = `
           <div class="position-counter">${index + 1}/${total}</div>
-          <img src="${proxyImage(char.imageUrl)}" class="character-img" onerror="this.src='https://via.placeholder.com/420x380/1f1f1f/ffffff?text=No+Image'">
+          <img src="https://api.allorigins.win/raw?url=${encodeURIComponent(char.imageUrl)}" class="character-img" onerror="this.src='https://via.placeholder.com/420x380/1f1f1f/ffffff?text=No+Image'">
           <div class="p-4 text-center flex-1 flex flex-col">
             <div class="font-semibold text-lg leading-tight name-on-card">${char.name}</div>
             <div class="text-[#57bb8a] font-medium mt-3">${char.kakera.toLocaleString()} ka</div>
@@ -621,7 +621,6 @@
       });
     }
 
-    // All other functions remain exactly the same as your v1.1test
     function shuffleUnlocked() {
       if (characters.length <= lockedCount + 1) return;
       let unlocked = characters.slice(lockedCount);
