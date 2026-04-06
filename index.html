@@ -115,6 +115,26 @@
       background-color: #4aa57a;
       transform: translateY(-1px);
     }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #1a1a1a;
+      border: 1px solid #57bb8a;
+      color: #57bb8a;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      z-index: 100;
+      animation: fadeInOut 3s forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translate(-50%, 20px); }
+      10% { opacity: 1; transform: translate(-50%, 0); }
+      90% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, 20px); }
+    }
   </style>
 </head>
 <body class="bg-[#111113] text-white min-h-screen">
@@ -124,7 +144,7 @@
       <div class="flex justify-between items-center gap-4">
         <div class="flex-shrink-0">
           <h1 class="text-3xl font-bold tracking-tight whitespace-nowrap">Mudae Harem Sorter</h1>
-          <p class="text-sm text-gray-400">v1.1test</p>
+          <p class="text-sm text-gray-400">v1.2.0</p>
         </div>
         
         <div class="flex items-center gap-3 flex-1 justify-end flex-wrap">
@@ -179,8 +199,21 @@
         <h2 class="text-2xl font-semibold mb-6">Paste your Mudae export with kakera</h2>
         <textarea id="importText" rows="18" class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl p-6 font-mono text-sm resize-y text-white"></textarea>
         <div class="flex gap-4 mt-6">
-          <button onclick="doImport()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Import</button>
+          <button onclick="performImport()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Import</button>
           <button onclick="hideImportBox()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Choice Modal -->
+    <div id="choiceModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[999]">
+      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-md w-full mx-4 border border-[#2a2a2a] text-center">
+        <h3 class="text-2xl font-semibold mb-6">Import Options</h3>
+        <p class="text-gray-400 mb-8">Your list already contains characters.<br>What would you like to do?</p>
+        <div class="flex flex-col gap-4">
+          <button onclick="replaceList()" class="py-4 bg-red-600 hover:bg-red-700 rounded-2xl text-lg font-semibold">Replace entire list</button>
+          <button onclick="addToBottom()" class="py-4 bg-[#57bb8a] text-black hover:bg-[#4aa57a] rounded-2xl text-lg font-semibold">Add new characters to bottom</button>
+          <button onclick="hideChoiceModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] py-4 rounded-2xl text-lg">Cancel</button>
         </div>
       </div>
     </div>
@@ -243,8 +276,12 @@
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">3.</span> Importing</h3>
-            <p class="text-[#cccccc]">Click <strong>📥 Import</strong>, paste the full export, and click Import.</p>
+            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">3.</span> Importing New Characters</h3>
+            <p class="text-[#cccccc]">• First import creates your list normally.<br>
+            • Subsequent imports will show a choice:<br>
+            &nbsp;&nbsp;• <strong>Replace entire list</strong> – Clears everything and starts fresh.<br>
+            &nbsp;&nbsp;• <strong>Add new characters to bottom</strong> – Keeps your current order, locks, and arrangement. Only adds characters that aren't already in your list.<br>
+            This makes it easy to keep your sorted harem up-to-date as you claim more waifus without losing your work.</p>
           </div>
 
           <div>
@@ -263,7 +300,6 @@
               <li><strong>Sort by Kakera</strong> – First click: High to Low • Second click: Low to High</li>
               <li><strong>Shuffle Unlocked</strong> – Randomly shuffles only the unlocked characters (locked ones stay at the top).</li>
             </ul>
-            <p class="text-sm text-[#aaaaaa] mt-2">Clicking a different sort button resets to its normal order.</p>
           </div>
 
           <div>
@@ -279,18 +315,14 @@
 
           <div>
             <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">7.</span> Navigation Sidebar</h3>
-            <p class="text-[#cccccc]">Left sidebar buttons let you quickly jump around:</p>
-            <ul class="list-disc pl-6 text-[#cccccc]">
-              <li><strong>↑ Go to Top</strong>, <strong>🔒 End of Locked</strong>, <strong>↓ Go to Bottom</strong></li>
-              <li><strong>↩ Return to Last Position</strong> – Jumps back to the exact scroll position you were at before using any other navigation button.</li>
-              <li><strong>📜 Jump to Output</strong></li>
-            </ul>
+            <p class="text-[#cccccc]">Left sidebar buttons let you quickly jump around.</p>
           </div>
 
           <div>
             <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">8.</span> Other Features</h3>
             <p class="text-[#cccccc]">• Drag cards to reorder freely (locked cards stay pinned at top).<br>
-            • <strong>🔓 Unlock All</strong> removes all locks.</p>
+            • <strong>🔓 Unlock All</strong> removes all locks.<br>
+            • Ctrl + Click on any card copies the character name to clipboard.</p>
           </div>
 
           <div>
@@ -318,11 +350,12 @@
     let currentSort = { field: null, direction: 'asc' };
     let lastScrollY = 0;
     const SAVE_KEY = 'mudaeHaremSave';
+    let pendingImportData = null;
 
     // ====================== SAVE SYSTEM ======================
     function saveToLocalStorage() {
       try {
-        const saveData = { version: "1.0-save", timestamp: Date.now(), lockedCount, characters };
+        const saveData = { version: "1.2.0", timestamp: Date.now(), lockedCount, characters };
         localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
       } catch (e) { console.warn("Auto-save failed", e); }
     }
@@ -359,7 +392,7 @@
         hideSavePopup();
         return;
       }
-      const saveData = { version: "1.0-save", timestamp: Date.now(), lockedCount, characters };
+      const saveData = { version: "1.2.0", timestamp: Date.now(), lockedCount, characters };
       const blob = new Blob([JSON.stringify(saveData, null, 2)], {type: 'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -411,105 +444,120 @@
     }
     // ====================== END SAVE SYSTEM ======================
 
-    // CORS Proxy helper - using a different proxy
-    function proxyImage(url) {
-      return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    function showImportBox() { 
+      document.getElementById('importBox').classList.remove('hidden'); 
+    }
+    function hideImportBox() { 
+      document.getElementById('importBox').classList.add('hidden'); 
+      document.getElementById('importText').value = ''; 
     }
 
-    function showImportBox() { document.getElementById('importBox').classList.remove('hidden'); }
-    function hideImportBox() { document.getElementById('importBox').classList.add('hidden'); }
-    function showHelp() { document.getElementById('helpBox').classList.remove('hidden'); }
-    function hideHelp() { document.getElementById('helpBox').classList.add('hidden'); }
-
-    function clearAll() {
-      if (confirm("Clear everything?")) {
-        characters = []; lockedCount = 0; currentSort = { field: null, direction: 'asc' };
-        document.getElementById('grid').innerHTML = '';
-        document.getElementById('commandsOutput').classList.add('hidden');
-        saveToLocalStorage();
-      }
+    function hideChoiceModal() {
+      document.getElementById('choiceModal').classList.add('hidden');
+      pendingImportData = null;
     }
 
-    function unlockAll() {
-      if (confirm("Unlock ALL characters?")) {
-        lockedCount = 0;
-        renderGrid();
-        saveToLocalStorage();
-      }
-    }
-
-    function goToTop() {
-      lastScrollY = window.scrollY;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function goToBottomOfLocked() {
-      lastScrollY = window.scrollY;
-      const cards = document.querySelectorAll('#grid > div');
-      if (cards[lockedCount - 1]) cards[lockedCount - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    function goToBottom() {
-      lastScrollY = window.scrollY;
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }
-    function returnToLastPosition() {
-      if (lastScrollY > 0) {
-        window.scrollTo({ top: lastScrollY, behavior: 'smooth' });
-      }
-    }
-    function jumpToOutput() {
-      lastScrollY = window.scrollY;
-      document.getElementById('commandsOutput').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function searchCharacter() {
-      let query = document.getElementById('searchInput').value.trim().toLowerCase();
-      if (!query) return;
-
-      const cards = Array.from(document.querySelectorAll('#grid > div'));
-
-      let bestCard = cards.find(card => {
-        const name = card.querySelector('.font-semibold').textContent.trim().toLowerCase();
-        return name === query;
-      });
-
-      if (!bestCard) {
-        bestCard = cards.find(card => {
-          const name = card.querySelector('.font-semibold').textContent.trim().toLowerCase();
-          return name.split(/\s+/).some(word => word === query);
-        });
-      }
-
-      if (!bestCard) {
-        bestCard = cards.find(card => {
-          const name = card.querySelector('.font-semibold').textContent.trim().toLowerCase();
-          return name.includes(query);
-        });
-      }
-
-      if (!bestCard) {
-        bestCard = cards.find(card => {
-          const seriesEl = card.querySelector('.text-sm');
-          if (!seriesEl) return false;
-          const seriesText = seriesEl.textContent.toLowerCase();
-          return seriesText.includes(query) || 
-                 query.split(' ').every(word => seriesText.includes(word));
-        });
-      }
-
-      if (bestCard) {
-        bestCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        bestCard.style.transition = 'all 0.6s';
-        bestCard.style.boxShadow = '0 0 0 6px #57bb8a';
-        setTimeout(() => bestCard.style.boxShadow = '', 2500);
-      } else {
-        alert("No matching character or series found.");
-      }
-    }
-
-    function doImport() {
+    function performImport() {
       const text = document.getElementById('importText').value.trim();
       if (!text) return alert("Please paste your Mudae export!");
 
+      pendingImportData = text;
+
+      if (characters.length === 0) {
+        doImport(text);
+        hideImportBox();
+        alert(`✅ Imported ${characters.length} waifus!`);
+      } else {
+        document.getElementById('choiceModal').classList.remove('hidden');
+      }
+    }
+
+    function replaceList() {
+      doImport(pendingImportData);
+      hideChoiceModal();
+      hideImportBox();
+      alert(`✅ Replaced with ${characters.length} waifus!`);
+    }
+
+    function addToBottom() {
+      const newChars = parseNewCharacters(pendingImportData);
+      const existingNames = new Set(characters.map(c => c.name.toLowerCase().trim()));
+
+      let added = 0;
+      newChars.forEach(char => {
+        if (!existingNames.has(char.name.toLowerCase().trim())) {
+          characters.push(char);
+          added++;
+        }
+      });
+
+      hideChoiceModal();
+      hideImportBox();
+      renderGrid();
+      saveToLocalStorage();
+      alert(`✅ Added ${added} new characters to the bottom!`);
+    }
+
+    function parseNewCharacters(text) {
+      const parsed = [];
+      let currentSeries = "Unknown";
+      const segments = text.split(/(\d{1,4}(?:,\d{3})?\s+ka\s*-\s*https?:\/\/[^\s\n]+)/gi);
+
+      for (let i = 0; i < segments.length - 1; i += 2) {
+        let namePart = segments[i].trim();
+        let kaPart = segments[i + 1] ? segments[i + 1].trim() : "";
+
+        const kakeraMatch = kaPart.match(/(\d{1,4}(?:,\d{3})?)\s+ka/);
+        const urlMatch = kaPart.match(/(https?:\/\/[^\s\n]+)/);
+        if (!kakeraMatch || !urlMatch) continue;
+
+        let raw = namePart.replace(/^\d+\.\s*/, '').replace(/<|>/g, '').trim();
+
+        if (raw.includes(' - ') && raw.match(/\d+\/\d+/)) {
+          let potentialSeries = raw.split(' - ')[0].trim();
+          const lower = potentialSeries.toLowerCase();
+          if (lower.includes("dungeon ni deai wo motomeru no wa machigatteiru darou ka") || 
+              lower.includes("danmachi") || 
+              lower.includes("is it wrong to try to pick up girls in a dungeon")) {
+            currentSeries = "Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka";
+          } else if (potentialSeries.length > 3 && !lower.includes("dungeon buster")) {
+            currentSeries = potentialSeries;
+          }
+        }
+
+        let name = raw;
+        name = name.replace(/-\s*\d+\/\d+.*$/, '').trim();
+        if (name.includes(' - ')) {
+          const parts = name.split(' - ');
+          name = parts[parts.length - 1].trim();
+        }
+        name = name.replace(/^\d+\/\d+\s+/, '').trim();
+        name = name.replace(/^.*:\s*/, '').trim();
+
+        let note = "";
+        const noteMatch = name.match(/\s*\|\s*(.+)$/);
+        if (noteMatch) {
+          note = noteMatch[1].trim();
+          name = name.replace(/\s*\|\s*.+$/, '').trim();
+        }
+
+        if (name.toLowerCase() === "hourei tenten" || name.toLowerCase() === "hourei tenen") name = "Hourei Tenten";
+
+        if (name && urlMatch[1] && name.length > 0) {
+          parsed.push({
+            name: name,
+            note: note,
+            series: currentSeries,
+            imageUrl: urlMatch[1],
+            kakera: parseInt(kakeraMatch[1].replace(/,/g, ''))
+          });
+        }
+      }
+      return parsed;
+    }
+
+    // ====================== ORIGINAL doImport (unchanged) ======================
+    function doImport(text) {
       characters = [];
       let currentSeries = "Unknown";
 
@@ -585,7 +633,7 @@
         
         card.innerHTML = `
           <div class="position-counter">${index + 1}/${total}</div>
-          <img src="https://api.allorigins.win/raw?url=${encodeURIComponent(char.imageUrl)}" class="character-img" onerror="this.src='https://via.placeholder.com/420x380/1f1f1f/ffffff?text=No+Image'">
+          <img src="${char.imageUrl}" class="character-img" onerror="this.src='https://via.placeholder.com/420x380/1f1f1f/ffffff?text=No+Image'">
           <div class="p-4 text-center flex-1 flex flex-col">
             <div class="font-semibold text-lg leading-tight name-on-card">${char.name}</div>
             <div class="text-[#57bb8a] font-medium mt-3">${char.kakera.toLocaleString()} ka</div>
@@ -600,6 +648,19 @@
           </div>
         `;
         grid.appendChild(card);
+
+        card.addEventListener('click', function(e) {
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            navigator.clipboard.writeText(char.name).then(() => {
+              const originalBorder = card.style.border;
+              card.style.border = '3px solid #57bb8a';
+              setTimeout(() => {
+                card.style.border = originalBorder;
+              }, 600);
+            });
+          }
+        });
       });
 
       new Sortable(grid, {
@@ -757,6 +818,101 @@
         btn.textContent = "✅ Copied!";
         setTimeout(() => btn.textContent = original, 1800);
       });
+    }
+
+    function clearAll() {
+      if (confirm("Clear everything?")) {
+        characters = []; 
+        lockedCount = 0; 
+        currentSort = { field: null, direction: 'asc' };
+        document.getElementById('grid').innerHTML = '';
+        document.getElementById('commandsOutput').classList.add('hidden');
+        saveToLocalStorage();
+      }
+    }
+
+    function unlockAll() {
+      if (confirm("Unlock ALL characters?")) {
+        lockedCount = 0;
+        renderGrid();
+        saveToLocalStorage();
+      }
+    }
+
+    function goToTop() {
+      lastScrollY = window.scrollY;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function goToBottomOfLocked() {
+      lastScrollY = window.scrollY;
+      const cards = document.querySelectorAll('#grid > div');
+      if (cards[lockedCount - 1]) cards[lockedCount - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    function goToBottom() {
+      lastScrollY = window.scrollY;
+      window.scrollTo({ top: document.getElementById('grid').offsetTop + document.getElementById('grid').offsetHeight, behavior: 'smooth' });
+    }
+    function returnToLastPosition() {
+      if (lastScrollY > 0) {
+        window.scrollTo({ top: lastScrollY, behavior: 'smooth' });
+      }
+    }
+    function jumpToOutput() {
+      lastScrollY = window.scrollY;
+      document.getElementById('commandsOutput').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function searchCharacter() {
+      let query = document.getElementById('searchInput').value.trim().toLowerCase();
+      if (!query) return;
+
+      const cards = Array.from(document.querySelectorAll('#grid > div'));
+
+      let bestCard = cards.find(card => {
+        const name = card.querySelector('.font-semibold').textContent.trim().toLowerCase();
+        return name === query;
+      });
+
+      if (!bestCard) {
+        bestCard = cards.find(card => {
+          const name = card.querySelector('.font-semibold').textContent.trim().toLowerCase();
+          return name.split(/\s+/).some(word => word === query);
+        });
+      }
+
+      if (!bestCard) {
+        bestCard = cards.find(card => {
+          const name = card.querySelector('.font-semibold').textContent.trim().toLowerCase();
+          return name.includes(query);
+        });
+      }
+
+      if (!bestCard) {
+        bestCard = cards.find(card => {
+          const seriesEl = card.querySelector('.text-sm');
+          if (!seriesEl) return false;
+          const seriesText = seriesEl.textContent.toLowerCase();
+          return seriesText.includes(query) || 
+                 query.split(' ').every(word => seriesText.includes(word));
+        });
+      }
+
+      if (bestCard) {
+        bestCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        bestCard.style.transition = 'all 0.6s';
+        bestCard.style.boxShadow = '0 0 0 6px #57bb8a';
+        setTimeout(() => bestCard.style.boxShadow = '', 2500);
+      } else {
+        alert("No matching character or series found.");
+      }
+    }
+
+    function showHelp() {
+      document.getElementById('helpBox').classList.remove('hidden');
+    }
+
+    function hideHelp() {
+      document.getElementById('helpBox').classList.add('hidden');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
