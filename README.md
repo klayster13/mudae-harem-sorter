@@ -24,7 +24,7 @@ Drag and drop to reorder, lock your favorites at the top, search by character or
 
 ## 🚀 Live Version
 
-**[Open Mudae Harem Sorter]([https://yourusername.github.io/mudae-harem-sorter](https://klayster13.github.io/mudae-harem-sorter/))**  
+**[Open Mudae Harem Sorter]** https://klayster13.github.io/mudae-harem-sorter/
 
 ## 📥 How to Use
 
