@@ -70,16 +70,16 @@
     }
 
     .top-btn {
-      min-width: 92px;
+      min-width: 82px;
       height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
       white-space: nowrap;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 600;
-      padding: 0 14px;
+      padding: 0 12px;
       border-radius: 9999px;
     }
 
@@ -115,45 +115,48 @@
       transform: translateY(-1px);
     }
 
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #1a1a1a;
-      border: 1px solid #57bb8a;
-      color: #57bb8a;
-      padding: 12px 24px;
+    .note-pill {
+      background-color: #57bb8a;
+      color: white;
+      font-size: 12px;
+      padding: 4px 12px;
       border-radius: 9999px;
-      z-index: 100;
-      animation: fadeInOut 3s forwards;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+      margin-bottom: 12px;
+      cursor: pointer;
+      align-self: center;
     }
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translate(-50%, 20px); }
-      10% { opacity: 1; transform: translate(-50%, 0); }
-      90% { opacity: 1; transform: translate(-50%, 0); }
-      100% { opacity: 0; transform: translate(-50%, 20px); }
+    .button-row {
+      border-top: 1px solid #2a2a2a;
+      padding: 8px 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 6px;
     }
   </style>
 </head>
 <body class="bg-[#111113] text-white min-h-screen">
   <div class="max-w-7xl mx-auto">
-    <!-- Slim Top Bar -->
+    <!-- Top Bar -->
     <div class="top-bar">
-      <div class="flex justify-between items-center gap-4">
+      <div class="flex justify-between items-center gap-3">
         <div class="flex-shrink-0">
           <h1 class="text-3xl font-bold tracking-tight whitespace-nowrap">Mudae Harem Sorter</h1>
-          <p class="text-sm text-gray-400">v1.2.0</p>
+          <p class="text-sm text-gray-400">v1.3.0</p>
         </div>
         
-        <div class="flex items-center gap-3 flex-1 justify-end flex-wrap">
-          <input id="searchInput" type="text" placeholder="Search character or series..." 
+        <div class="flex items-center gap-2 flex-1 justify-end">
+          <input id="searchInput" type="text" placeholder="Search character, series, or note..." 
                  onkeypress="if(event.key === 'Enter') searchCharacter()"
                  class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl px-5 py-2.5 text-white w-72 focus:outline-none focus:border-[#57bb8a]">
 
           <button onclick="showImportBox()" class="top-btn accent-btn">📥 Import</button>
           <button onclick="showSaveImportBox()" class="top-btn accent-btn">📂 Load</button>
           <button onclick="showSavePopup()" class="top-btn accent-btn">💾 Save</button>
+          <button onclick="openNotesModal()" class="top-btn accent-btn">📝 Note</button>
           <button onclick="generateCommands()" class="top-btn accent-btn">📋 $sm</button>
           <button onclick="clearAll()" class="top-btn accent-btn">🗑️ Clear</button>
           <button onclick="showHelp()" class="top-btn accent-btn">❔ Help</button>
@@ -186,6 +189,7 @@
           <button id="sortNameBtn" onclick="sortByName()" class="accent-btn w-full py-4 rounded-2xl text-base">🔤 Sort by Name</button>
           <button id="sortSeriesBtn" onclick="sortBySeries()" class="accent-btn w-full py-4 rounded-2xl text-base">📚 Sort by Series</button>
           <button id="sortKakeraBtn" onclick="sortByKakera()" class="accent-btn w-full py-4 rounded-2xl text-base">💎 Sort by Kakera</button>
+          <button id="sortNoteBtn" onclick="sortByNote()" class="accent-btn w-full py-4 rounded-2xl text-base">📝 Sort by Note</button>
           <button onclick="shuffleUnlocked()" class="accent-btn w-full py-4 rounded-2xl text-base">🔀 Shuffle Unlocked</button>
           <button onclick="unlockAll()" class="accent-btn w-full py-4 rounded-2xl text-base">🔓 Unlock All</button>
         </div>
@@ -248,92 +252,99 @@
       </div>
     </div>
 
-    <!-- Help Modal - Your full original version with the requested addition -->
+    <!-- Help Modal -->
     <div id="helpBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
-      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-3xl w-full mx-4 border border-[#2a2a2a] max-h-[90vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-3xl font-bold">Mudae Harem Sorter - Instructions</h2>
+      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-4xl w-full mx-4 border border-[#2a2a2a] max-h-[92vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-8 sticky top-0 bg-[#1a1a1a] pb-6 border-b border-[#2a2a2a]">
+          <h2 class="text-3xl font-bold">Mudae Harem Sorter v1.3.0 - Help</h2>
           <button onclick="hideHelp()" class="text-4xl leading-none text-white hover:text-[#57bb8a]">×</button>
         </div>
 
-        <div class="space-y-8 text-white">
-          <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">1.</span> Save System</h3>
-            <p class="text-[#cccccc]">• <strong>Auto Save</strong>: Every change (drag, lock, sort, import) is automatically saved to your browser.<br>
-            • <strong>Save</strong>: Click to choose a filename and download a backup JSON file.<br>
-            • <strong>Load</strong>: Restore a previous save (choose file or paste JSON).</p>
-          </div>
+        <div class="space-y-12 text-[#cccccc]">
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">2.</span> Getting Your Export from Mudae</h3>
-            <p class="text-[#cccccc]">In Mudae, type one of these commands to generate a clean export thread:</p>
-            <ul class="list-disc pl-6 mt-2 text-[#cccccc]">
-              <li><code class="bg-[#111113] px-2 py-0.5 rounded">$mmak-i-s</code> → Use this for base kakera values</li>
-              <li><code class="bg-[#111113] px-2 py-0.5 rounded">$mmaki-s</code> → Use this if you want key kakera values</li>
+            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">1.</span> Getting Started</h3>
+            <p class="mb-3">In Mudae, use one of these commands to generate your export:</p>
+            <ul class="list-disc pl-6 space-y-1 mb-4">
+              <li><code class="bg-[#111113] px-2 py-0.5 rounded">$mmak-i-s</code> — Base kakera values</li>
+              <li><code class="bg-[#111113] px-2 py-0.5 rounded">$mmaki-s</code> — Key kakera values</li>
             </ul>
-            <p class="mt-3 text-sm text-[#aaaaaa]">Copy the entire output and paste it into the Import box.</p>
+            <p>Copy the entire output and paste it with the <strong>📥 Import</strong> button.</p>
+            
+            <p class="mt-4"><strong>Adding to an existing list:</strong> If you already have a sorted list saved, you can import a new export. The tool will detect existing characters and ask whether to <strong>Replace entire list</strong> or <strong>Add new characters to the bottom</strong>. This lets you keep your carefully sorted order while adding newly claimed waifus without losing your previous work.</p>
+            
+            <p class="mt-4"><strong>Auto-save</strong> is always on. Use <strong>💾 Save</strong> to download a backup JSON and <strong>📂 Load</strong> to restore one.</p>
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">3.</span> Importing</h3>
-            <p class="text-[#cccccc]">Click <strong>📥 Import</strong>, paste the full export, and click Import.</p>
-          </div>
-
-          <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">4.</span> Search</h3>
-            <p class="text-[#cccccc]">Type a character name or series name in the top bar and press Enter.<br>
-            • Character search jumps to that character.<br>
-            • Series search jumps to the highest character from that series in your current list.</p>
-          </div>
-
-          <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">5.</span> Sorting</h3>
-            <p class="text-[#cccccc]">Use the buttons on the right sidebar:</p>
-            <ul class="list-disc pl-6 text-[#cccccc]">
-              <li><strong>Sort by Name</strong> – First click: A-Z • Second click: Z-A</li>
-              <li><strong>Sort by Series</strong> – First click: A-Z • Second click: Z-A</li>
-              <li><strong>Sort by Kakera</strong> – First click: High to Low • Second click: Low to High</li>
-              <li><strong>Shuffle Unlocked</strong> – Randomly shuffles only the unlocked characters (locked ones stay at the top).</li>
-            </ul>
-            <p class="text-sm text-[#aaaaaa] mt-2">Clicking a different sort button resets to its normal order.</p>
-          </div>
-
-          <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">6.</span> Per-Card Controls</h3>
-            <ul class="list-disc pl-6 text-[#cccccc]">
-              <li><strong>↑</strong> – Move to bottom of locked section</li>
-              <li><strong>↓</strong> – Move to very bottom</li>
-              <li><strong>SERIES</strong> – Move all unlocked characters from same series below locked section</li>
-              <li><strong>🔒 Lock</strong> – Lock this character + everything above it</li>
-              <li><strong>🔓 Unlock</strong> – Unlock this character + everything below it</li>
+            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">2.</span> The Grid & Controls</h3>
+            <ul class="list-disc pl-6 space-y-3">
+              <li><strong>Drag & Drop</strong> — Freely reorder characters. Locked cards stay pinned at the top and cannot be dragged.</li>
+              <li><strong>Position Counter</strong> — Shows x/y position on every card.</li>
+              <li><strong>Ctrl + Click</strong> any card to copy the character name to clipboard.</li>
+              <li><strong>Per-card buttons (bottom row):</strong>
+                <ul class="list-disc pl-6 mt-2 space-y-1">
+                  <li><strong>↑</strong> — Move to bottom of locked section</li>
+                  <li><strong>↓</strong> — Move to very bottom</li>
+                  <li><strong>SERIES</strong> — Move all unlocked characters from the same series below the locked section</li>
+                  <li><strong>🔒 / 🔓</strong> — Lock this character + everything above it, or unlock this character + everything below it</li>
+                </ul>
+              </li>
             </ul>
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">7.</span> Navigation Sidebar</h3>
-            <p class="text-[#cccccc]">Left sidebar buttons let you quickly jump around:</p>
-            <ul class="list-disc pl-6 text-[#cccccc]">
-              <li><strong>↑ Go to Top</strong>, <strong>🔒 End of Locked</strong>, <strong>↓ Go to Bottom</strong></li>
-              <li><strong>↩ Return to Last Position</strong> – Jumps back to the exact scroll position you were at before using any other navigation button.</li>
-              <li><strong>📜 Jump to Output</strong></li>
+            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">3.</span> Locking & Navigation</h3>
+            <p class="mb-4"><strong>Locking System:</strong> Locked characters are protected at the top. Locking one character also locks everything above it.</p>
+            <p class="mb-4"><strong>Left Navigation Sidebar:</strong></p>
+            <ul class="list-disc pl-6 space-y-2">
+              <li><strong>↑ Go to Top</strong></li>
+              <li><strong>🔒 End of Locked</strong> — Jump to the last locked character</li>
+              <li><strong>↓ Go to Bottom</strong> — Jump to the end of your harem</li>
+              <li><strong>↩ Return to Last Position</strong> — Returns you to where you were before using any navigation button</li>
+              <li><strong>📜 Jump to Output</strong> — Scroll to the generated $sm commands</li>
             </ul>
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">8.</span> Other Features</h3>
-            <p class="text-[#cccccc]">• Drag cards to reorder freely (locked cards stay pinned at top).<br>
-            • <strong>🔓 Unlock All</strong> removes all locks.<br>
-            • **Ctrl + Click** on any card copies the character name to clipboard.</p>
+            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">4.</span> Sorting Options (Right Sidebar)</h3>
+            <ul class="list-disc pl-6 space-y-2">
+              <li><strong>Sort by Name</strong> — A→Z (first click), Z→A (second click)</li>
+              <li><strong>Sort by Series</strong> — Groups by series, then high→low kakera</li>
+              <li><strong>Sort by Kakera</strong> — High→Low (first click), Low→High (second click)</li>
+              <li><strong>Sort by Note</strong> — Moves all noted characters to the top (grouped alphabetically by note, then high→low kakera within each note). Characters without notes go to the bottom (sorted alphabetically by name).</li>
+              <li><strong>Shuffle Unlocked</strong> — Randomly shuffles only unlocked characters</li>
+              <li><strong>Unlock All</strong> — Removes every lock</li>
+            </ul>
           </div>
 
           <div>
-            <h3 class="text-xl font-semibold mb-3 flex items-center gap-2"><span class="text-[#57bb8a]">9.</span> Generate Commands</h3>
-            <p class="text-[#cccccc]">Click <strong>📋 $sm</strong> to create ready-to-paste Discord commands (automatically split and chained with $smpos).</p>
+            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">5.</span> Notes System</h3>
+            <ul class="list-disc pl-6 space-y-3">
+              <li><strong>Green Note Pill</strong> — Click the green pill on any card to open the note editor.</li>
+              <li><strong>Quick Notes Setup</strong> — Click top <strong>📝 Note</strong> button → "Quick Notes Setup" to pre-fill your 8 reusable notes.</li>
+              <li><strong>Applying Notes</strong> — In the modal, pick a quick note or type a custom one, then click Confirm.</li>
+              <li><strong>Clear Note</strong> — Clear a single character's note from inside the pill modal.</li>
+              <li><strong>Clear All Notes</strong> — Available in the main Notes menu (requires confirmation).</li>
+              <li><strong>Note Export</strong> — In the Notes menu, enter the exact note text (case-sensitive), then generate multiple <code>$n name$name$name$yournote</code> strings ready for Mudae. Automatically split if too long.</li>
+            </ul>
           </div>
+
+          <div>
+            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">6.</span> Search</h3>
+            <p>The top search bar finds matches in character names, series names, <strong>or notes</strong>. Press Enter to jump to the best match.</p>
+          </div>
+
+          <div>
+            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">7.</span> Generating $sm Commands</h3>
+            <p>Click <strong>📋 $sm</strong> to create ready-to-paste Discord sorting commands. The output is automatically split into multiple boxes with proper <code>$smpos</code> chaining when needed. Use the copy button on each box.</p>
+          </div>
+
         </div>
 
-        <div class="mt-10 flex justify-center">
-          <button onclick="hideHelp()" class="accent-btn px-10 py-4 rounded-2xl text-lg">Close Instructions</button>
+        <div class="mt-12 text-center">
+          <p class="text-[#57bb8a] font-medium mb-6">Thank you for using Mudae Harem Sorter!</p>
+          <button onclick="hideHelp()" class="accent-btn px-12 py-4 rounded-2xl text-lg font-semibold">Close Help</button>
         </div>
       </div>
     </div>
@@ -345,6 +356,73 @@
     </div>
   </div>
 
+  <!-- Notes Tools Modal -->
+  <div id="notesModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[999]">
+    <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-md w-full mx-4 border border-[#2a2a2a]">
+      <h2 class="text-2xl font-semibold mb-6 text-center">Notes Tools</h2>
+      <div class="flex flex-col gap-4">
+        <button onclick="openQuickNotesSetup()" class="accent-btn py-5 rounded-2xl text-lg font-semibold">Quick Notes Setup</button>
+        <button onclick="openNoteExportModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] py-5 rounded-2xl text-lg font-semibold">Note Export</button>
+        <button onclick="clearAllNotes()" class="bg-red-600 hover:bg-red-700 py-5 rounded-2xl text-lg font-semibold">Clear All Notes</button>
+        <button onclick="hideNotesModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] py-4 rounded-2xl text-lg">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Notes Setup Modal -->
+  <div id="quickNotesSetupModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[1000]">
+    <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-lg w-full mx-4 border border-[#2a2a2a]">
+      <h2 class="text-2xl font-semibold mb-6">Quick Notes Setup (8 slots)</h2>
+      <div id="quickNotesInputs" class="space-y-3"></div>
+      <div class="flex gap-4 mt-8">
+        <button onclick="saveQuickNotes()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Save Quick Notes</button>
+        <button onclick="hideQuickNotesSetupModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note Apply Modal -->
+  <div id="noteApplyModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[1001]">
+    <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-md w-full mx-4 border border-[#2a2a2a]">
+      <h2 class="text-2xl font-semibold mb-6 text-center">Apply Note</h2>
+      
+      <div class="grid grid-cols-2 gap-3 mb-6" id="quickNoteButtons">
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm text-gray-400 mb-2">Custom note:</label>
+        <input id="customNoteInput" type="text" class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-[#57bb8a]" placeholder="Type custom note...">
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="applyNoteToCharacter()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Confirm</button>
+        <button onclick="clearCurrentNote()" class="bg-red-600 hover:bg-red-700 flex-1 py-4 rounded-2xl text-lg">Clear Note</button>
+        <button onclick="hideNoteApplyModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note Generation Modal -->
+  <div id="noteExportModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[1002]">
+    <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-2xl w-full mx-4 border border-[#2a2a2a]">
+      <h2 class="text-2xl font-semibold mb-6 text-center">Generate $n Note Import Strings</h2>
+      
+      <div class="mb-6">
+        <label class="block text-sm text-gray-400 mb-2">Exact note text to match (case-sensitive)</label>
+        <input id="noteExportInput" type="text" 
+               class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-[#57bb8a]" 
+               placeholder="e.g. s9 or bunny">
+      </div>
+
+      <div class="flex gap-4 mb-8">
+        <button onclick="generateNoteExport()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Generate $n Strings</button>
+        <button onclick="hideNoteExportModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Close</button>
+      </div>
+
+      <div id="noteExportOutput" class="space-y-8 max-h-[60vh] overflow-y-auto"></div>
+    </div>
+  </div>
+
   <script>
     let characters = [];
     let lockedCount = 0;
@@ -352,8 +430,192 @@
     let lastScrollY = 0;
     const SAVE_KEY = 'mudaeHaremSave';
     let pendingImportData = null;
+    let quickNotes = ["", "", "", "", "", "", "", ""];
+    let currentEditingIndex = -1;
 
-    // ====================== SAVE SYSTEM ======================
+    function loadQuickNotes() {
+      const saved = localStorage.getItem('mudaeQuickNotes');
+      if (saved) quickNotes = JSON.parse(saved);
+    }
+
+    function saveQuickNotes() {
+      for (let i = 0; i < 8; i++) {
+        const input = document.getElementById(`quickNote${i}`);
+        if (input) quickNotes[i] = input.value.trim();
+      }
+      localStorage.setItem('mudaeQuickNotes', JSON.stringify(quickNotes));
+      hideQuickNotesSetupModal();
+      alert("Quick notes saved!");
+    }
+
+    function openNotesModal() {
+      document.getElementById('notesModal').classList.remove('hidden');
+    }
+
+    function hideNotesModal() {
+      document.getElementById('notesModal').classList.add('hidden');
+    }
+
+    function openQuickNotesSetup() {
+      hideNotesModal();
+      const container = document.getElementById('quickNotesInputs');
+      container.innerHTML = '';
+      for (let i = 0; i < 8; i++) {
+        const div = document.createElement('div');
+        div.className = "flex items-center gap-3";
+        div.innerHTML = `
+          <span class="w-6 text-right font-mono text-[#57bb8a]">${i+1}.</span>
+          <input id="quickNote${i}" type="text" value="${quickNotes[i] || ''}" 
+                 class="flex-1 bg-[#111113] border border-[#2a2a2a] rounded-2xl px-4 py-3 text-white">
+        `;
+        container.appendChild(div);
+      }
+      document.getElementById('quickNotesSetupModal').classList.remove('hidden');
+    }
+
+    function hideQuickNotesSetupModal() {
+      document.getElementById('quickNotesSetupModal').classList.add('hidden');
+    }
+
+    function clearAllNotes() {
+      if (!confirm("Clear the note field for ALL characters? This cannot be undone.")) return;
+      
+      characters.forEach(char => {
+        char.note = "";
+      });
+      hideNotesModal();
+      renderGrid();
+      saveToLocalStorage();
+      alert("All notes cleared.");
+    }
+
+    function editNote(index) {
+      currentEditingIndex = index;
+      const char = characters[index];
+      if (!char) return;
+
+      const container = document.getElementById('quickNoteButtons');
+      container.innerHTML = '';
+
+      for (let i = 0; i < 8; i++) {
+        const btn = document.createElement('button');
+        btn.className = `quick-note-btn py-3 rounded-2xl text-sm font-medium ${quickNotes[i] ? 'accent-btn' : 'bg-[#2a2a2a] text-gray-500 cursor-not-allowed'}`;
+        btn.textContent = quickNotes[i] || '(empty)';
+        btn.disabled = !quickNotes[i];
+        if (quickNotes[i]) {
+          btn.onclick = () => {
+            char.note = quickNotes[i];
+            hideNoteApplyModal();
+            renderGrid();
+            saveToLocalStorage();
+          };
+        }
+        container.appendChild(btn);
+      }
+
+      document.getElementById('customNoteInput').value = char.note || '';
+      document.getElementById('noteApplyModal').classList.remove('hidden');
+    }
+
+    function hideNoteApplyModal() {
+      document.getElementById('noteApplyModal').classList.add('hidden');
+      currentEditingIndex = -1;
+    }
+
+    function applyNoteToCharacter() {
+      if (currentEditingIndex === -1) return;
+      const char = characters[currentEditingIndex];
+      const custom = document.getElementById('customNoteInput').value.trim();
+
+      if (custom) {
+        char.note = custom;
+        hideNoteApplyModal();
+        renderGrid();
+        saveToLocalStorage();
+      } else {
+        alert("Please enter a custom note or select a quick note.");
+      }
+    }
+
+    function clearCurrentNote() {
+      if (currentEditingIndex === -1) return;
+      const char = characters[currentEditingIndex];
+      
+      if (confirm("Clear this character's note?")) {
+        char.note = "";
+        hideNoteApplyModal();
+        renderGrid();
+        saveToLocalStorage();
+      }
+    }
+
+    function openNoteExportModal() {
+      hideNotesModal();
+      document.getElementById('noteExportInput').value = '';
+      document.getElementById('noteExportOutput').innerHTML = '';
+      document.getElementById('noteExportModal').classList.remove('hidden');
+    }
+
+    function hideNoteExportModal() {
+      document.getElementById('noteExportModal').classList.add('hidden');
+    }
+
+    function generateNoteExport() {
+      const noteText = document.getElementById('noteExportInput').value.trim();
+      if (!noteText) {
+        alert("Please enter the exact note text to match (case-sensitive).");
+        return;
+      }
+
+      const matchingChars = characters.filter(c => c.note === noteText);
+      if (matchingChars.length === 0) {
+        alert(`No characters found with the exact note: "${noteText}"`);
+        return;
+      }
+
+      const container = document.getElementById('noteExportOutput');
+      container.innerHTML = '';
+
+      const MAX_CHARS = 1985;
+      let currentBox = [];
+      let boxNumber = 1;
+
+      matchingChars.forEach(char => {
+        const name = char.name;
+        const testStr = currentBox.length === 0 ? `$n ${name}` : `$${name}`;
+        
+        if (currentBox.length > 0 && (currentBox.join('$').length + testStr.length > MAX_CHARS)) {
+          createNoteBox(boxNumber, currentBox, noteText);
+          boxNumber++;
+          currentBox = [];
+        }
+        currentBox.push(name);
+      });
+
+      if (currentBox.length > 0) {
+        createNoteBox(boxNumber, currentBox, noteText);
+      }
+    }
+
+    function createNoteBox(boxNum, names, noteText) {
+      const container = document.getElementById('noteExportOutput');
+      const command = `$n ${names.join('$')}$${noteText}`;
+      
+      const div = document.createElement('div');
+      div.className = "bg-[#1a1a1a] rounded-3xl p-6 border border-[#2a2a2a]";
+      div.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h3 class="font-semibold text-lg text-[#57bb8a]">Box ${boxNum}</h3>
+            <p class="text-sm text-[#aaaaaa]">${names.length} characters</p>
+          </div>
+          <button onclick="copyThisBox(this)" class="accent-btn px-6 py-2 rounded-2xl text-sm">📋 Copy Box</button>
+        </div>
+        <pre class="bg-[#111113] p-5 rounded-2xl font-mono text-sm whitespace-pre-wrap overflow-auto">${command}</pre>
+      `;
+      container.appendChild(div);
+    }
+
     function saveToLocalStorage() {
       try {
         const saveData = { version: "1.2.0", timestamp: Date.now(), lockedCount, characters };
@@ -443,7 +705,6 @@
         }
       } catch { alert("Invalid JSON."); }
     }
-    // ====================== END SAVE SYSTEM ======================
 
     function showImportBox() { 
       document.getElementById('importBox').classList.remove('hidden'); 
@@ -634,17 +895,19 @@
         card.innerHTML = `
           <div class="position-counter">${index + 1}/${total}</div>
           <img src="${char.imageUrl}" class="character-img" onerror="this.src='https://via.placeholder.com/420x380/1f1f1f/ffffff?text=No+Image'">
-          <div class="p-4 text-center flex-1 flex flex-col">
+          <div class="card-content p-4 text-center flex-1 flex flex-col">
             <div class="font-semibold text-lg leading-tight name-on-card">${char.name}</div>
             <div class="text-[#57bb8a] font-medium mt-3">${char.kakera.toLocaleString()} ka</div>
-            ${char.note ? `<div class="inline-block bg-[#2a2a2a] text-[#57bb8a] text-xs px-3 py-1 rounded-full mt-1">📝 ${char.note}</div>` : ''}
-            <div class="text-sm mt-auto pt-2">${char.series}</div>
+            <div class="text-sm mt-2">${char.series}</div>
+            <div onclick="editNote(${index}); event.stopImmediatePropagation()" class="note-pill mx-auto">
+              📝 ${char.note ? char.note : 'Add note'}
+            </div>
           </div>
-          <div class="border-t border-[#2a2a2a] p-3 grid grid-cols-2 gap-2">
-            <button onclick="moveUp(${index}); event.stopImmediatePropagation();" class="py-3 text-xl font-medium rounded-2xl bg-[#2a2a2a] hover:bg-[#3a3a3a] ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}">↑</button>
-            <button onclick="moveDown(${index}); event.stopImmediatePropagation();" class="py-3 text-xl font-medium rounded-2xl bg-[#2a2a2a] hover:bg-[#3a3a3a] ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}">↓</button>
-            <button onclick="moveSeriesToLocked('${char.series.replace(/'/g, "\\'")}'); event.stopImmediatePropagation();" class="py-3 text-sm font-medium rounded-2xl bg-[#2a2a2a] hover:bg-[#3a3a3a] ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}">SERIES</button>
-            <button onclick="toggleLock('${char.name.replace(/'/g, "\\'")}'); event.stopImmediatePropagation();" class="py-3 text-sm font-medium rounded-2xl ${isLocked ? 'bg-[#57bb8a] hover:bg-[#4aa57a] text-black' : 'bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white'}">${isLocked ? '🔓 Unlock' : '🔒 Lock'}</button>
+          <div class="button-row">
+            <button onclick="moveUp(${index}); event.stopImmediatePropagation();" class="py-2.5 text-lg font-medium rounded-2xl bg-[#2a2a2a] hover:bg-[#3a3a3a] ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}">↑</button>
+            <button onclick="moveDown(${index}); event.stopImmediatePropagation();" class="py-2.5 text-lg font-medium rounded-2xl bg-[#2a2a2a] hover:bg-[#3a3a3a] ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}">↓</button>
+            <button onclick="moveSeriesToLocked('${char.series.replace(/'/g, "\\'")}'); event.stopImmediatePropagation();" class="py-2.5 text-sm font-medium rounded-2xl bg-[#2a2a2a] hover:bg-[#3a3a3a] ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}">SERIES</button>
+            <button onclick="toggleLock('${char.name.replace(/'/g, "\\'")}'); event.stopImmediatePropagation();" class="py-2.5 text-lg font-medium rounded-2xl ${isLocked ? 'bg-[#57bb8a] hover:bg-[#4aa57a] text-black' : 'bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white'}">${isLocked ? '🔓' : '🔒'}</button>
           </div>
         `;
         grid.appendChild(card);
@@ -713,6 +976,32 @@
       toggleSort('kakera', (a, b) => b.kakera - a.kakera);
     }
 
+    // FIXED: Sort by Note now respects locks
+    function sortByNote() {
+      if (!characters.length) return alert("Import your harem first!");
+
+      // Keep locked characters at the top unchanged
+      let locked = characters.slice(0, lockedCount);
+      let unlocked = characters.slice(lockedCount);
+
+      // Sort only the unlocked portion by note rules
+      let withNotes = unlocked.filter(c => c.note && c.note.trim() !== "");
+      let withoutNotes = unlocked.filter(c => !c.note || c.note.trim() === "");
+
+      withNotes.sort((a, b) => {
+        if (a.note !== b.note) return a.note.localeCompare(b.note);
+        return b.kakera - a.kakera;
+      });
+
+      withoutNotes.sort((a, b) => a.name.localeCompare(b.name));
+
+      // Reassemble: locked first, then sorted unlocked
+      characters = [...locked, ...withNotes, ...withoutNotes];
+
+      renderGrid();
+      saveToLocalStorage();
+    }
+
     function toggleSort(field, comparator) {
       if (currentSort.field === field) {
         currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
@@ -720,11 +1009,9 @@
         currentSort.field = field;
         currentSort.direction = 'asc';
       }
-
       let unlocked = characters.slice(lockedCount);
       unlocked.sort(comparator);
       if (currentSort.direction === 'desc') unlocked.reverse();
-
       characters = [...characters.slice(0, lockedCount), ...unlocked];
       renderGrid();
       saveToLocalStorage();
@@ -821,10 +1108,12 @@
     }
 
     function clearAll() {
-      if (confirm("Clear everything?")) {
+      if (confirm("Clear everything (harem, locks, output, AND quick note slots)?")) {
         characters = []; 
         lockedCount = 0; 
         currentSort = { field: null, direction: 'asc' };
+        quickNotes = ["", "", "", "", "", "", "", ""];
+        localStorage.setItem('mudaeQuickNotes', JSON.stringify(quickNotes));
         document.getElementById('grid').innerHTML = '';
         document.getElementById('commandsOutput').classList.add('hidden');
         saveToLocalStorage();
@@ -843,20 +1132,33 @@
       lastScrollY = window.scrollY;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
     function goToBottomOfLocked() {
       lastScrollY = window.scrollY;
       const cards = document.querySelectorAll('#grid > div');
       if (cards[lockedCount - 1]) cards[lockedCount - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+
     function goToBottom() {
       lastScrollY = window.scrollY;
-      window.scrollTo({ top: document.getElementById('grid').offsetTop + document.getElementById('grid').offsetHeight, behavior: 'smooth' });
+      const gridElement = document.getElementById('grid');
+      if (gridElement && gridElement.children.length > 0) {
+        const lastCard = gridElement.lastElementChild;
+        if (lastCard) {
+          lastCard.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        } else {
+          const bottomPosition = gridElement.offsetTop + gridElement.offsetHeight + 100;
+          window.scrollTo({ top: bottomPosition, behavior: 'smooth' });
+        }
+      }
     }
+
     function returnToLastPosition() {
       if (lastScrollY > 0) {
         window.scrollTo({ top: lastScrollY, behavior: 'smooth' });
       }
     }
+
     function jumpToOutput() {
       lastScrollY = window.scrollY;
       document.getElementById('commandsOutput').scrollIntoView({ behavior: 'smooth' });
@@ -889,6 +1191,15 @@
 
       if (!bestCard) {
         bestCard = cards.find(card => {
+          const noteEl = card.querySelector('.note-pill');
+          if (!noteEl) return false;
+          const noteText = noteEl.textContent.replace('📝 ', '').toLowerCase().trim();
+          return noteText.includes(query);
+        });
+      }
+
+      if (!bestCard) {
+        bestCard = cards.find(card => {
           const seriesEl = card.querySelector('.text-sm');
           if (!seriesEl) return false;
           const seriesText = seriesEl.textContent.toLowerCase();
@@ -903,7 +1214,7 @@
         bestCard.style.boxShadow = '0 0 0 6px #57bb8a';
         setTimeout(() => bestCard.style.boxShadow = '', 2500);
       } else {
-        alert("No matching character or series found.");
+        alert("No matching character, series, or note found.");
       }
     }
 
@@ -916,6 +1227,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      loadQuickNotes();
       if (loadFromLocalStorage()) {
         renderGrid();
       }
