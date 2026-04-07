@@ -4,7 +4,8 @@ A clean and fast web tool for organizing your **Mudae** waifu/husbando harem. Su
 
 Drag and drop to reorder, lock your favorites at the top, search by character or series, and instantly generate ready-to-paste `$sm` and `$smpos` commands for Discord.
 
-<img width="2548" height="1305" alt="image" src="https://github.com/user-attachments/assets/c46a5e7e-201c-42c0-97e3-76e1aee64d24" />
+<img width="2538" height="1294" alt="image" src="https://github.com/user-attachments/assets/0d6db09b-e842-4d60-ae72-d3879abb843c" />
+
 
 ## 🚀 Live Version (currently buggy, recommend downloading and running directly on your browser for now)
 
