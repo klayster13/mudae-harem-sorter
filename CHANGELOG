@@ -2,8 +2,35 @@
 
 All notable changes to the Mudae Harem Sorter will be documented in this file.
 
-Changelog
-[v1.3.0] - 2026-04-06
+Mudae Harem Sorter - Changelog
+v1.4.2 2026-04-07
+Major Features & Improvements
+
+Full Spheres (SP) & Perks Support
+Added robust parsing for invested spheres and perk data from $mmai-k-z+z!s and $mmai-kz+z!s exports.
+Characters now display total SP invested and perk status directly on every card.
+"Full" perk investment is shown as "All Perks Maxed".
+Characters with no investment now clearly show 0 sp and No perks (instead of ambiguous dashes).
+New Sorting Option
+Added "💠 Sort by Spheres" with intelligent tie-breaking:
+Primary: Spheres (High → Low)
+Tie-breaker 1: Kakera (High → Low)
+Tie-breaker 2: Character name (A → Z)
+
+Improved Parser (v1.4.x overhaul)
+Completely rebuilt the import parser to be significantly more reliable with series headers, notes, SP values, and complex perk strings.
+Better handling of edge cases and long series names.
+User Experience Polish
+Spheres now use the same accent green color as kakera for visual consistency.
+Updated Help modal with clearer instructions on what to copy from Mudae exports (starting from the first series header).
+Minor layout and readability improvements on character cards.
+Technical Updates
+Version bumped to 1.4.2 (major version increase due to sphere system + parser overhaul).
+Save file format updated to version 1.4.2 (backward compatible with previous saves).
+Search now includes SP values and perk text.
+
+
+v1.3.0 - 2026-04-06
 Major New Feature: Full Notes System
 
 Added persistent per-character notes with a prominent green note pill on every card.
@@ -25,7 +52,8 @@ Technical
 Notes are now saved persistently with the harem data.
 Minor robustness improvements to note handling and clearing flows.
 
-[v1.2.0] - 2026-04-06
+
+v1.2.0 - 2026-04-06
 Added
 
 New import option: "Add new characters to bottom" – when a list already exists, you now get a choice between "Replace entire list" or "Add new characters to the bottom". Only new characters (deduplicated by name) are appended, preserving your current order, locks, and arrangement.
@@ -38,14 +66,15 @@ Fixed
 
 Help button now works correctly.
 Clear button now fully clears the list and UI.
-Jump to Bottom button now scrolls to the actual bottom of the grid (not the $sm output section).
+Jump to Bottom button now scrolls to the actual bottom of the grid.
 
 Changed
 
 Version bumped to 1.2.0.
 Help modal updated with new import instructions.
 
-[v1.1test] - 2026-04 (pre-1.2.0)
+
+v1.1test - 2026-04 (pre-1.2.0)
 Added
 
 Full save/load system (auto localStorage + manual JSON download/upload + paste import).
@@ -63,7 +92,8 @@ Fixed
 Series detection (DANMACHI special case and long titles).
 Various layout and button alignment issues from earlier iterations.
 
-[v1.0] - Initial Stable Release
+
+v1.0 - Initial Stable Release
 Added
 
 Core Mudae export parser ($mmak-i-s / $mmaki-s support).
