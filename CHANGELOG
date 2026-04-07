@@ -2,49 +2,78 @@
 
 All notable changes to the Mudae Harem Sorter will be documented in this file.
 
-## [1.2.0] - 2026-04-06
-### Added
-- New import option: **"Add new characters to bottom"** – when a list already exists, you now get a choice between "Replace entire list" or "Add new characters to bottom". Only new characters (deduplicated by name) are appended, preserving your current order, locks, and arrangement.
-- Auto-clear of the import textarea after successful import (both Replace and Add).
-- Toast notifications for clearer feedback on import actions.
-- Dedicated section in the Help modal explaining how to import new characters to an existing list.
-- Ctrl + Click on any card now copies the character name to clipboard (already present in v1.1test but now documented).
+Changelog
+[v1.3.0] - 2026-04-06
+Major New Feature: Full Notes System
 
-### Fixed
-- Help button now works correctly.
-- Clear button now fully clears the list and UI.
-- Jump to Bottom button now scrolls to the actual bottom of the grid (not the $sm output section).
+Added persistent per-character notes with a prominent green note pill on every card.
+Quick Notes Setup: 8 reusable note slots accessible from the top "📝 Note" button.
+Note editor modal with quick note buttons + custom note input.
+Clear Note (per character) and Clear All Notes options.
+Note Export: Generate ready-to-paste $n name$name$name$yournote strings for Mudae (automatically split to respect Discord’s character limit).
 
-### Changed
-- Version bumped to 1.2.0.
-- Help modal updated with new import instructions.
+Improvements & Fixes
 
-## [1.1test] - 2026-04 (pre-1.2.0)
-### Added
-- Full save/load system (auto localStorage + manual JSON download/upload + paste import).
-- Slim top bar with uniform buttons.
-- Fixed sidebars at 775px offset from center.
-- Ctrl + Click to copy character name to clipboard.
-- Position counters on every card (x/y).
-- Note display as green pills under kakera.
-- Search bar that supports character and series search.
-- Navigation sidebar (To Top, End of Locked, To Bottom, Return to Last Position, Jump to Output).
-- Improved $sm command generation with proper $smpos chaining and per-box copy buttons.
+Top bar 🗑️ Clear button now fully resets everything (harem, locks, output, and quick note slots).
+Sort by Note now properly respects locked characters (locked section stays at the top unchanged).
+Added clear explanation in the Help modal about adding new characters to an existing sorted list.
+Completely overhauled the Help modal with better organization, clearer sections, and improved readability.
+Updated version display to v1.3.0 and added a "Thank you for using Mudae Harem Sorter!" message in the Help modal.
 
-### Fixed
-- Series detection (DANMACHI special case and long titles).
-- Various layout and button alignment issues from earlier iterations.
+Technical
 
-## [1.0] - Initial Stable Release
-### Added
-- Core Mudae export parser ($mmak-i-s / $mmaki-s support).
-- Drag & drop grid with locked section pinning.
-- Per-card controls (↑ ↓ SERIES Lock/Unlock).
-- Sorting by Name, Series, Kakera (with reverse on second click).
-- Shuffle Unlocked.
-- $sm command generation with automatic splitting.
-- Help modal with full instructions.
-- Basic save system foundation.
+Notes are now saved persistently with the harem data.
+Minor robustness improvements to note handling and clearing flows.
+
+[v1.2.0] - 2026-04-06
+Added
+
+New import option: "Add new characters to bottom" – when a list already exists, you now get a choice between "Replace entire list" or "Add new characters to the bottom". Only new characters (deduplicated by name) are appended, preserving your current order, locks, and arrangement.
+Auto-clear of the import textarea after successful import (both Replace and Add).
+Toast notifications for clearer feedback on import actions.
+Dedicated section in the Help modal explaining how to import new characters to an existing list.
+Ctrl + Click on any card now copies the character name to clipboard.
+
+Fixed
+
+Help button now works correctly.
+Clear button now fully clears the list and UI.
+Jump to Bottom button now scrolls to the actual bottom of the grid (not the $sm output section).
+
+Changed
+
+Version bumped to 1.2.0.
+Help modal updated with new import instructions.
+
+[v1.1test] - 2026-04 (pre-1.2.0)
+Added
+
+Full save/load system (auto localStorage + manual JSON download/upload + paste import).
+Slim top bar with uniform buttons.
+Fixed sidebars at 775px offset from center.
+Ctrl + Click to copy character name to clipboard.
+Position counters on every card (x/y).
+Note display as green pills under kakera.
+Search bar that supports character and series search.
+Navigation sidebar (To Top, End of Locked, To Bottom, Return to Last Position, Jump to Output).
+Improved $sm command generation with proper $smpos chaining and per-box copy buttons.
+
+Fixed
+
+Series detection (DANMACHI special case and long titles).
+Various layout and button alignment issues from earlier iterations.
+
+[v1.0] - Initial Stable Release
+Added
+
+Core Mudae export parser ($mmak-i-s / $mmaki-s support).
+Drag & drop grid with locked section pinning.
+Per-card controls (↑ ↓ SERIES Lock/Unlock).
+Sorting by Name, Series, Kakera (with reverse on second click).
+Shuffle Unlocked.
+$sm command generation with automatic splitting.
+Help modal with full instructions.
+Basic save system foundation.
 
 ---
 
