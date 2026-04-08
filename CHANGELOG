@@ -92,6 +92,7 @@ instead of ambiguous placeholders.
 Version bumped to 1.4.2.
 Save file metadata version updated to 1.4.2 (backward compatible).
 Search expanded to include SP values and perk text.
+
 v1.3.0 — 2026-04-06
 🚀 Added
 Full Notes system:
@@ -124,6 +125,7 @@ Version display updated to v1.3.0.
 🛠️ Technical
 Notes now persist with saved harem data.
 Minor robustness updates in note apply/clear flows.
+
 v1.2.0 — 2026-04-06
 🚀 Added
 New import option when list already exists:
@@ -144,6 +146,7 @@ Jump to Bottom now scrolls to true grid bottom.
 🧹 Changed
 Version bumped to 1.2.0.
 Help modal updated with new import workflow guidance.
+
 v1.1test — 2026-04 (pre-1.2.0)
 🚀 Added
 Full save/load system:
@@ -168,6 +171,7 @@ Per-box copy buttons
 🐛 Fixed
 Series detection improvements (including DanMachi and long titles).
 Multiple layout/button alignment issues from earlier builds.
+
 v1.0 — Initial Stable Release
 🚀 Added
 Core Mudae export parser ($mmak-i-s / $mmaki-s support).
