@@ -4,6 +4,10 @@ All notable changes to the Mudae Harem Sorter will be documented in this file.
 
 ## [1.5.0] - 2026-04-08
 
+v1.5.1 - 2026-04-08
+🛠️ Technical / Internal
+Fixed a bug with the intake parser where it could assign sphere values to the characters if they had a number followed by sp in the url link for image importing.
+
 v1.5.0 — 2026-04-08
 🚀 Added
 New Stats modal with:
