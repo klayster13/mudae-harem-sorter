@@ -2,108 +2,189 @@
 
 All notable changes to the Mudae Harem Sorter will be documented in this file.
 
-Mudae Harem Sorter - Changelog
-v1.4.2 2026-04-07
-Major Features & Improvements
+## [1.5.0] - 2026-04-08
 
-Full Spheres (SP) & Perks Support
-Added robust parsing for invested spheres and perk data from $mmai-k-z+z!s and $mmai-kz+z!s exports.
-Characters now display total SP invested and perk status directly on every card.
-"Full" perk investment is shown as "All Perks Maxed".
-Characters with no investment now clearly show 0 sp and No perks (instead of ambiguous dashes).
-New Sorting Option
-Added "💠 Sort by Spheres" with intelligent tie-breaking:
-Primary: Spheres (High → Low)
-Tie-breaker 1: Kakera (High → Low)
-Tie-breaker 2: Character name (A → Z)
+v1.5.0 — 2026-04-08
+🚀 Added
+New Stats modal with:
+Total Characters
+Locked Characters
+Total Kakera
+Total Spheres
+Unique Series
+Characters with Notes
+Most Valuable Characters (Top 5)
+Perk Distribution (Perk 10 unlocked, Full maxed)
+Series Breakdown (count + total kakera)
+New generic confirm dialog system for destructive actions.
+New toast notification system for unified user feedback.
+New modal stack handling with:
+Escape-to-close top modal
+Overlay click-to-close
+Body scroll lock while modals are open.
+ID-based character model with UUID fallback for stable operations.
+Delegated grid action handling via data-action buttons.
+Image update modal flow for per-character image URL edits.
+Series move confirmation modal before moving series under locked section.
+Help modal updates documenting current workflows and stats.
+✨ Improved
+Refactored render flow into renderAndSave() for consistent UI + persistence updates.
+Improved merge flow:
+Updates kakera, spheres, perks, series, and notes for existing characters.
+Prompts before applying detected image URL changes.
+Improved copy workflows:
+Ctrl/Cmd+Click card to copy character name.
+Per-box copy button feedback for generated command boxes.
+Improved command generation:
+Auto-splits long $sm output into safe chunks.
+Uses $smpos chaining across boxes.
+Improved note tools:
+Quick Notes setup (8 slots)
+Per-character quick/custom note apply
+Exact-match $n note export with auto chunking.
+Improved sorting behavior and tie-break consistency (notably SP sort fallback logic).
+Improved search matching across character name, series, note, perks, and SP.
+🧹 Changed
+Stats modal cleanup:
+Removed Average Kakera
+Removed Average Spheres
+Removed Least Valuable Characters section
+Updated stats computation logic to match cleaned modal content.
+Updated Help content to reflect current feature set.
+Version bumped to v1.5.0 in:
+Top bar label
+Help modal title
+Local save metadata
+Downloaded JSON save metadata
+🛠️ Technical / Internal
+Consolidated reusable helpers (escapeHtml, character ID helpers, modal helpers).
+Added safer load/import handling with validation and graceful failure messaging.
+Standardized UI state persistence through local storage save points.
 
-Improved Parser (v1.4.x overhaul)
-Completely rebuilt the import parser to be significantly more reliable with series headers, notes, SP values, and complex perk strings.
-Better handling of edge cases and long series names.
-User Experience Polish
-Spheres now use the same accent green color as kakera for visual consistency.
-Updated Help modal with clearer instructions on what to copy from Mudae exports (starting from the first series header).
-Minor layout and readability improvements on character cards.
-Technical Updates
-Version bumped to 1.4.2 (major version increase due to sphere system + parser overhaul).
-Save file format updated to version 1.4.2 (backward compatible with previous saves).
-Search now includes SP values and perk text.
-
-
-v1.3.0 - 2026-04-06
-Major New Feature: Full Notes System
-
-Added persistent per-character notes with a prominent green note pill on every card.
-Quick Notes Setup: 8 reusable note slots accessible from the top "📝 Note" button.
-Note editor modal with quick note buttons + custom note input.
-Clear Note (per character) and Clear All Notes options.
-Note Export: Generate ready-to-paste $n name$name$name$yournote strings for Mudae (automatically split to respect Discord’s character limit).
-
-Improvements & Fixes
-
-Top bar 🗑️ Clear button now fully resets everything (harem, locks, output, and quick note slots).
-Sort by Note now properly respects locked characters (locked section stays at the top unchanged).
-Added clear explanation in the Help modal about adding new characters to an existing sorted list.
-Completely overhauled the Help modal with better organization, clearer sections, and improved readability.
-Updated version display to v1.3.0 and added a "Thank you for using Mudae Harem Sorter!" message in the Help modal.
-
-Technical
-
-Notes are now saved persistently with the harem data.
-Minor robustness improvements to note handling and clearing flows.
-
-
-v1.2.0 - 2026-04-06
-Added
-
-New import option: "Add new characters to bottom" – when a list already exists, you now get a choice between "Replace entire list" or "Add new characters to the bottom". Only new characters (deduplicated by name) are appended, preserving your current order, locks, and arrangement.
-Auto-clear of the import textarea after successful import (both Replace and Add).
-Toast notifications for clearer feedback on import actions.
-Dedicated section in the Help modal explaining how to import new characters to an existing list.
-Ctrl + Click on any card now copies the character name to clipboard.
-
-Fixed
-
-Help button now works correctly.
-Clear button now fully clears the list and UI.
-Jump to Bottom button now scrolls to the actual bottom of the grid.
-
-Changed
-
+v1.4.2 — 2026-04-07
+🚀 Added
+Full Spheres (SP) and Perks support from:
+$mmai-k-z+z!s
+$mmai-kz+z!s
+Character cards now display:
+Total SP invested
+Perk status
+Added 💠 Sort by Spheres with tie-breaking:
+Primary: SP (High → Low)
+Tie 1: Kakera (High → Low)
+Tie 2: Name (A → Z)
+✨ Improved
+Parser overhauled for more reliable handling of:
+Series headers
+Notes
+SP values
+Complex perk strings
+Better edge-case handling for long/complex series names.
+SP styling now matches kakera accent color for consistency.
+Help modal instructions improved for export-copy workflow.
+🧹 Changed
+"Full" perks now shown as All Perks Maxed.
+Characters with no investment now show:
+0 sp
+No perks
+instead of ambiguous placeholders.
+🛠️ Technical
+Version bumped to 1.4.2.
+Save file metadata version updated to 1.4.2 (backward compatible).
+Search expanded to include SP values and perk text.
+v1.3.0 — 2026-04-06
+🚀 Added
+Full Notes system:
+Persistent per-character notes
+Green note pill on each card
+Quick Notes Setup:
+8 reusable note slots from top 📝 Note menu
+Note editor modal:
+Quick note buttons
+Custom note input
+Note management actions:
+Clear note (single character)
+Clear all notes
+Note Export:
+Generates ready-to-paste $n name$name$name$note commands
+Auto-splits output to stay within Discord character limits
+✨ Improved
+Help modal fully reorganized and expanded for clarity/readability.
+Added clear guidance for importing new characters into existing sorted lists.
+Added thank-you message in Help modal.
+🐛 Fixed
+🗑️ Clear now fully resets:
+Harem
+Locks
+Output
+Quick note slots
+Sort by Note now correctly preserves locked-section behavior.
+🧹 Changed
+Version display updated to v1.3.0.
+🛠️ Technical
+Notes now persist with saved harem data.
+Minor robustness updates in note apply/clear flows.
+v1.2.0 — 2026-04-06
+🚀 Added
+New import option when list already exists:
+Replace entire list
+Add new characters to bottom
+Add-to-bottom behavior:
+Deduplicates by character name
+Appends only new characters
+Preserves existing order/locks
+Import textarea now auto-clears after successful import.
+Added toast notifications for import feedback.
+Added Help section for importing into existing lists.
+Ctrl + Click on card copies character name to clipboard.
+🐛 Fixed
+Help button functionality corrected.
+Clear button now fully clears list and UI.
+Jump to Bottom now scrolls to true grid bottom.
+🧹 Changed
 Version bumped to 1.2.0.
-Help modal updated with new import instructions.
-
-
-v1.1test - 2026-04 (pre-1.2.0)
-Added
-
-Full save/load system (auto localStorage + manual JSON download/upload + paste import).
+Help modal updated with new import workflow guidance.
+v1.1test — 2026-04 (pre-1.2.0)
+🚀 Added
+Full save/load system:
+Auto localStorage
+Manual JSON download/upload
+Paste JSON import
 Slim top bar with uniform buttons.
-Fixed sidebars at 775px offset from center.
-Ctrl + Click to copy character name to clipboard.
-Position counters on every card (x/y).
-Note display as green pills under kakera.
-Search bar that supports character and series search.
-Navigation sidebar (To Top, End of Locked, To Bottom, Return to Last Position, Jump to Output).
-Improved $sm command generation with proper $smpos chaining and per-box copy buttons.
-
-Fixed
-
-Series detection (DANMACHI special case and long titles).
-Various layout and button alignment issues from earlier iterations.
-
-
-v1.0 - Initial Stable Release
-Added
-
+Fixed sidebars positioned at 775px from center.
+Ctrl + Click name copy.
+Position counters on each card (x/y).
+Note display as green pills.
+Search support for character and series.
+Navigation sidebar:
+Top
+End of Locked
+Bottom
+Return to Last Position
+Jump to Output
+Improved $sm generation:
+Proper $smpos chaining
+Per-box copy buttons
+🐛 Fixed
+Series detection improvements (including DanMachi and long titles).
+Multiple layout/button alignment issues from earlier builds.
+v1.0 — Initial Stable Release
+🚀 Added
 Core Mudae export parser ($mmak-i-s / $mmaki-s support).
-Drag & drop grid with locked section pinning.
-Per-card controls (↑ ↓ SERIES Lock/Unlock).
-Sorting by Name, Series, Kakera (with reverse on second click).
-Shuffle Unlocked.
+Drag-and-drop grid with locked section pinning.
+Per-card controls:
+Move up/down
+Move series
+Lock/Unlock
+Sorting by:
+Name
+Series
+Kakera
+(reverse on second click)
+Shuffle unlocked characters.
 $sm command generation with automatic splitting.
-Help modal with full instructions.
-Basic save system foundation.
+Help modal with usage instructions.
+Initial save system foundation.
 
 ---
 
