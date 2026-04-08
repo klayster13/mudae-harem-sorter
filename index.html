@@ -264,7 +264,7 @@
       <div class="flex justify-between items-center gap-3">
         <div class="flex-shrink-0">
           <h1 class="text-3xl font-bold tracking-tight whitespace-nowrap">Mudae Harem Sorter</h1>
-          <p class="text-sm text-gray-400">v1.5.0</p>
+          <p class="text-sm text-gray-400">v1.5.1</p>
         </div>
         
         <div class="flex items-center gap-2 flex-1 justify-end">
@@ -472,7 +472,7 @@
     <div id="helpBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]" data-overlay="true">
       <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-4xl w-full mx-4 border border-[#2a2a2a] max-h-[92vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-8 sticky top-0 bg-[#1a1a1a] pb-6 border-b border-[#2a2a2a]">
-          <h2 class="text-3xl font-bold">Mudae Harem Sorter v1.5.0 - Help</h2>
+          <h2 class="text-3xl font-bold">Mudae Harem Sorter v1.5.1 - Help</h2>
           <button id="helpCloseBtn" class="text-4xl leading-none text-white hover:text-[#57bb8a]">×</button>
         </div>
         <div class="space-y-12 text-[#cccccc]">
@@ -1020,7 +1020,7 @@
     }
 
     function saveToLocalStorage() {
-      const saveData = { version: "1.5.0", timestamp: Date.now(), lockedCount, characters };
+      const saveData = { version: "1.5.1", timestamp: Date.now(), lockedCount, characters };
       localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
     }
 
@@ -1049,7 +1049,7 @@
     function performSave() {
       const filename = document.getElementById('saveFilename').value.trim() || `mudae-harem-save-${new Date().toISOString().slice(0,10)}.json`;
       if (!characters.length) return showToast("Nothing to save.");
-      const saveData = { version: "1.5.0", timestamp: Date.now(), lockedCount, characters };
+      const saveData = { version: "1.5.1", timestamp: Date.now(), lockedCount, characters };
       const blob = new Blob([JSON.stringify(saveData, null, 2)], {type: 'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1152,15 +1152,20 @@
         let namePart = line.substring(0, line.toLowerCase().indexOf(kakeraMatch[0].toLowerCase())).trim();
         namePart = namePart.replace(/^\d+\.\s*/, '').replace(/<|>/g, '').trim();
 
+        const kaIdx = line.toLowerCase().indexOf(kakeraMatch[0].toLowerCase());
+        const afterKa = line.substring(kaIdx + kakeraMatch[0].length);
+        const urlStart = afterKa.search(/https?:\/\//i);
+        const beforeUrl = urlStart !== -1 ? afterKa.substring(0, urlStart) : afterKa;
+
         let sp = null;
-        const spMatch = line.match(/(\d{1,6}(?:,\d{3})?)\s*sp/i);
+        const spMatch = beforeUrl.match(/(\d{1,6}(?:,\d{3})?)\s*sp/i);
         if (spMatch) sp = parseInt(spMatch[1].replace(/,/g, ''), 10);
 
         let perks = "";
-        const perkMatch = line.match(/sp\s*-\s*([^-\n]+?)\s*-\s*https/i);
+        const perkMatch = afterKa.match(/sp\s*-\s*([^-\n]+?)\s*-\s*https/i);
         if (perkMatch) perks = perkMatch[1].trim();
-        else if (line.includes("Full")) perks = "Full";
-        else if (line.match(/sp\s*-\s*10\s*-\s*https/)) perks = "10";
+        else if (beforeUrl.includes("Full")) perks = "Full";
+        else if (afterKa.match(/sp\s*-\s*10\s*-\s*https/)) perks = "10";
 
         let note = "";
         const noteMatch = namePart.match(/\s*\|\s*(.+?)\s*$/);
