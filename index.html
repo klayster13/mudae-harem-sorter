@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mudae Harem Sorter</title>
-  
   <meta http-equiv="Content-Security-Policy" content="img-src * data: https:;">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  
   <style>
     :root { --accent: #57bb8a; }
     
@@ -16,17 +16,27 @@
       transition: all 0.2s ease;
       user-select: none;
       position: relative;
+      width: 100%;
+      max-width: 280px;
     }
     .card:hover {
       transform: scale(1.04);
       box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
     }
-    .character-img {
-      width: 420px;
-      height: 380px;
-      object-fit: cover;
+
+    .character-img-container {
+      position: relative;
+      width: 100%;
+      height: 340px;
       border-radius: 16px 16px 0 0;
+      overflow: hidden;
     }
+    .character-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
     .locked {
       border-left: 6px solid #57bb8a !important;
       background-color: #1a1a1a !important;
@@ -41,6 +51,45 @@
       opacity: 0.9;
       box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.6);
       z-index: 10;
+    }
+
+    .image-update-btn {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0,0,0,0.65);
+      color: white;
+      font-size: 15px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .card:hover .image-update-btn {
+      opacity: 1;
+    }
+    .image-update-btn:hover {
+      background: #57bb8a;
+      color: #000;
+    }
+
+    .position-counter {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.75);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      z-index: 5;
     }
 
     .sidebar {
@@ -83,27 +132,6 @@
       border-radius: 9999px;
     }
 
-    .name-on-card {
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .position-counter {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: rgba(0,0,0,0.75);
-      color: white;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 9999px;
-      z-index: 5;
-    }
-
     .accent-btn {
       background-color: #57bb8a;
       color: #000;
@@ -125,16 +153,107 @@
       align-items: center;
       gap: 6px;
       margin-top: auto;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
       cursor: pointer;
       align-self: center;
     }
     .button-row {
       border-top: 1px solid #2a2a2a;
-      padding: 8px 12px;
+      padding: 4px 8px;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
       gap: 6px;
+    }
+    .button-row button {
+      padding: 8px 4px;
+      font-size: 17px;
+      font-weight: 700;
+      border-radius: 12px;
+    }
+
+    #toastMessage {
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      opacity: 0;
+      transform: translateY(16px) translateX(-50%);
+      pointer-events: none;
+    }
+    #toastMessage.show {
+      opacity: 1;
+      transform: translateY(0) translateX(-50%);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background-color: #0f0f0f;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #57bb8a;
+      margin: 8px 0;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stats-section {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #2a2a2a;
+    }
+
+    .stats-section h3 {
+      color: #57bb8a;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .series-list {
+      max-height: 300px;
+      overflow-y: auto;
+      background-color: #0f0f0f;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .series-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      font-size: 13px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .series-item:last-child {
+      border-bottom: none;
+    }
+
+    .series-name {
+      flex: 1;
+    }
+
+    .series-stats {
+      color: #57bb8a;
+      font-weight: 600;
+      margin-left: 12px;
     }
   </style>
 </head>
@@ -145,21 +264,20 @@
       <div class="flex justify-between items-center gap-3">
         <div class="flex-shrink-0">
           <h1 class="text-3xl font-bold tracking-tight whitespace-nowrap">Mudae Harem Sorter</h1>
-          <p class="text-sm text-gray-400">v1.4.2</p>
+          <p class="text-sm text-gray-400">v1.5.0</p>
         </div>
         
         <div class="flex items-center gap-2 flex-1 justify-end">
-          <input id="searchInput" type="text" placeholder="Search character, series, note, or SP..." 
-                 onkeypress="if(event.key === 'Enter') searchCharacter()"
+          <input id="searchInput" type="text" placeholder="Search character, series, note, or SP..."
                  class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl px-5 py-2.5 text-white w-80 focus:outline-none focus:border-[#57bb8a]">
-
-          <button onclick="showImportBox()" class="top-btn accent-btn">📥 Import</button>
-          <button onclick="showSaveImportBox()" class="top-btn accent-btn">📂 Load</button>
-          <button onclick="showSavePopup()" class="top-btn accent-btn">💾 Save</button>
-          <button onclick="openNotesModal()" class="top-btn accent-btn">📝 Note</button>
-          <button onclick="generateCommands()" class="top-btn accent-btn">📋 $sm</button>
-          <button onclick="clearAll()" class="top-btn accent-btn">🗑️ Clear</button>
-          <button onclick="showHelp()" class="top-btn accent-btn">❔ Help</button>
+          <button id="importBtn" class="top-btn accent-btn">📥 Import</button>
+          <button id="loadBtn" class="top-btn accent-btn">📂 Load</button>
+          <button id="saveBtn" class="top-btn accent-btn">💾 Save</button>
+          <button id="notesBtn" class="top-btn accent-btn">📝 Note</button>
+          <button id="statsBtn" class="top-btn accent-btn">📊 Stats</button>
+          <button id="generateBtn" class="top-btn accent-btn">📋 $sm</button>
+          <button id="clearBtn" class="top-btn accent-btn">🗑️ Clear</button>
+          <button id="helpBtn" class="top-btn accent-btn">❔ Help</button>
         </div>
       </div>
     </div>
@@ -169,11 +287,11 @@
       <div class="left-sidebar sidebar">
         <h3 class="font-semibold text-lg mb-6 text-center tracking-widest">NAVIGATION</h3>
         <div class="space-y-3 flex-1">
-          <button onclick="goToTop()" class="accent-btn w-full py-4 rounded-2xl text-base">↑ Go to Top</button>
-          <button onclick="goToBottomOfLocked()" class="accent-btn w-full py-4 rounded-2xl text-base">🔒 End of Locked</button>
-          <button onclick="goToBottom()" class="accent-btn w-full py-4 rounded-2xl text-base">↓ Go to Bottom</button>
-          <button onclick="returnToLastPosition()" class="accent-btn w-full py-4 rounded-2xl text-base">↩ Return to Last Position</button>
-          <button onclick="jumpToOutput()" class="accent-btn w-full py-4 rounded-2xl text-base">📜 Jump to Output</button>
+          <button id="gotoTopBtn" class="accent-btn w-full py-4 rounded-2xl text-base">↑ Go to Top</button>
+          <button id="gotoLockedBtn" class="accent-btn w-full py-4 rounded-2xl text-base">🔒 End of Locked</button>
+          <button id="gotoBottomBtn" class="accent-btn w-full py-4 rounded-2xl text-base">↓ Go to Bottom</button>
+          <button id="returnBtn" class="accent-btn w-full py-4 rounded-2xl text-base">↩ Return to Last Position</button>
+          <button id="jumpOutputBtn" class="accent-btn w-full py-4 rounded-2xl text-base">📜 Jump to Output</button>
         </div>
       </div>
 
@@ -186,60 +304,60 @@
       <div class="right-sidebar sidebar">
         <h3 class="font-semibold text-lg mb-6 text-center tracking-widest">SORT OPTIONS</h3>
         <div class="space-y-3 flex-1">
-          <button onclick="sortByName()" class="accent-btn w-full py-4 rounded-2xl text-base">🔤 Sort by Name</button>
-          <button onclick="sortBySeries()" class="accent-btn w-full py-4 rounded-2xl text-base">📚 Sort by Series</button>
-          <button onclick="sortByKakera()" class="accent-btn w-full py-4 rounded-2xl text-base">💎 Sort by Kakera</button>
-          <button onclick="sortBySpheres()" class="accent-btn w-full py-4 rounded-2xl text-base">💠 Sort by Spheres</button>
-          <button onclick="sortByNote()" class="accent-btn w-full py-4 rounded-2xl text-base">📝 Sort by Note</button>
-          <button onclick="shuffleUnlocked()" class="accent-btn w-full py-4 rounded-2xl text-base">🔀 Shuffle Unlocked</button>
-          <button onclick="unlockAll()" class="accent-btn w-full py-4 rounded-2xl text-base">🔓 Unlock All</button>
+          <button id="sortNameBtn" class="accent-btn w-full py-4 rounded-2xl text-base">🔤 Sort by Name</button>
+          <button id="sortSeriesBtn" class="accent-btn w-full py-4 rounded-2xl text-base">📚 Sort by Series</button>
+          <button id="sortKakeraBtn" class="accent-btn w-full py-4 rounded-2xl text-base">💎 Sort by Kakera</button>
+          <button id="sortSpheresBtn" class="accent-btn w-full py-4 rounded-2xl text-base">💠 Sort by Spheres</button>
+          <button id="sortNoteBtn" class="accent-btn w-full py-4 rounded-2xl text-base">📝 Sort by Note</button>
+          <button id="shuffleBtn" class="accent-btn w-full py-4 rounded-2xl text-base">🔀 Shuffle Unlocked</button>
+          <button id="unlockAllBtn" class="accent-btn w-full py-4 rounded-2xl text-base">🔓 Unlock All</button>
         </div>
       </div>
     </div>
 
     <!-- Import Modal -->
-    <div id="importBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div id="importBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50" data-overlay="true">
       <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-2xl w-full mx-4 border border-[#2a2a2a]">
         <h2 class="text-2xl font-semibold mb-6">Paste your Mudae export with kakera</h2>
         <textarea id="importText" rows="18" class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl p-6 font-mono text-sm resize-y text-white"></textarea>
         <div class="flex gap-4 mt-6">
-          <button onclick="performImport()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Import</button>
-          <button onclick="hideImportBox()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+          <button id="importConfirmBtn" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Import</button>
+          <button id="importCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
         </div>
       </div>
     </div>
 
     <!-- Choice Modal -->
-    <div id="choiceModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[999]">
+    <div id="choiceModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[999]" data-overlay="true">
       <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-md w-full mx-4 border border-[#2a2a2a] text-center">
         <h3 class="text-2xl font-semibold mb-6">Import Options</h3>
         <p class="text-gray-400 mb-8">Your list already contains characters.<br>What would you like to do?</p>
         <div class="flex flex-col gap-4">
-          <button onclick="replaceList()" class="py-4 bg-red-600 hover:bg-red-700 rounded-2xl text-lg font-semibold">Replace entire list</button>
-          <button onclick="addToBottom()" class="py-4 bg-[#57bb8a] text-black hover:bg-[#4aa57a] rounded-2xl text-lg font-semibold">Add new characters to bottom</button>
-          <button onclick="hideChoiceModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] py-4 rounded-2xl text-lg">Cancel</button>
+          <button id="replaceListBtn" class="py-4 bg-red-600 hover:bg-red-700 rounded-2xl text-lg font-semibold">Replace entire list</button>
+          <button id="mergeListBtn" class="py-4 bg-[#57bb8a] text-black hover:bg-[#4aa57a] rounded-2xl text-lg font-semibold">Merge with existing list (recommended)</button>
+          <button id="choiceCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] py-4 rounded-2xl text-lg">Cancel</button>
         </div>
       </div>
     </div>
 
     <!-- Save Import Modal -->
-    <div id="saveImportBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div id="saveImportBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50" data-overlay="true">
       <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-lg w-full mx-4 border border-[#2a2a2a]">
         <h2 class="text-2xl font-semibold mb-6">Import Save</h2>
         <div class="border-2 border-dashed border-[#2a2a2a] rounded-2xl p-8 text-center mb-6">
-          <input type="file" id="saveFileInput" accept=".json" class="hidden" onchange="handleSaveFileUpload(event)">
-          <button onclick="document.getElementById('saveFileInput').click()" class="accent-btn px-8 py-3 rounded-2xl">Choose .json File</button>
+          <input type="file" id="saveFileInput" accept=".json" class="hidden">
+          <button id="saveFileChooseBtn" class="accent-btn px-8 py-3 rounded-2xl">Choose .json File</button>
         </div>
         <textarea id="savePasteText" rows="8" placeholder="Or paste JSON here..." class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl p-6 font-mono text-sm resize-y"></textarea>
         <div class="flex gap-4 mt-6">
-          <button onclick="importSaveFromPaste()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Import from Paste</button>
-          <button onclick="hideSaveImportBox()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+          <button id="savePasteImportBtn" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Import from Paste</button>
+          <button id="saveImportCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
         </div>
       </div>
     </div>
 
     <!-- Save Popup -->
-    <div id="savePopup" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div id="savePopup" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50" data-overlay="true">
       <div class="bg-[#1a1a1a] rounded-3xl p-8 w-full max-w-md border border-[#2a2a2a]">
         <h2 class="text-2xl font-semibold mb-6">Save Harem</h2>
         <div class="mb-6">
@@ -247,22 +365,117 @@
           <input id="saveFilename" type="text" class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-[#57bb8a]">
         </div>
         <div class="flex gap-4">
-          <button onclick="performSave()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Download Save</button>
-          <button onclick="hideSavePopup()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+          <button id="saveConfirmBtn" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Download Save</button>
+          <button id="saveCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
         </div>
       </div>
     </div>
 
-    <!-- Help Modal - Updated with correct copy instructions -->
-    <div id="helpBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
-      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-4xl w-full mx-4 border border-[#2a2a2a] max-h-[92vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-8 sticky top-0 bg-[#1a1a1a] pb-6 border-b border-[#2a2a2a]">
-          <h2 class="text-3xl font-bold">Mudae Harem Sorter v1.4.2 - Help</h2>
-          <button onclick="hideHelp()" class="text-4xl leading-none text-white hover:text-[#57bb8a]">×</button>
+    <div id="imageModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[10001]" data-overlay="true">
+      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-md w-full mx-4 border border-[#2a2a2a]">
+        <h2 class="text-2xl font-semibold mb-6 text-center">Update Character Image</h2>
+        <div class="mb-6">
+          <label class="block text-sm text-gray-400 mb-2">Image URL</label>
+          <input id="imageUrlInput" type="text" class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-[#57bb8a]" placeholder="Paste image URL here">
+        </div>
+        <div class="flex gap-4">
+          <button id="imageUpdateConfirmBtn" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Update Image</button>
+          <button id="imageUpdateCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="seriesConfirmModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[10002]" data-overlay="true">
+      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-md w-full mx-4 border border-[#2a2a2a] text-center">
+        <h2 class="text-2xl font-semibold mb-4">Confirm Series Move</h2>
+        <p class="text-gray-300 mb-8">
+          Move all unlocked characters from
+          <span id="seriesConfirmName" class="font-semibold text-white"></span>
+          below the locked section?
+        </p>
+        <div class="flex gap-4">
+          <button id="seriesConfirmBtn" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Confirm</button>
+          <button id="seriesCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="confirmDialog" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[10003]" data-overlay="true">
+      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-md w-full mx-4 border border-[#2a2a2a] text-center">
+        <h2 id="confirmDialogTitle" class="text-2xl font-semibold mb-4"></h2>
+        <p id="confirmDialogMessage" class="text-gray-300 mb-8 whitespace-pre-wrap"></p>
+        <div class="flex gap-4">
+          <button id="confirmDialogAcceptBtn" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Confirm</button>
+          <button id="confirmDialogCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastMessage" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#111113] border border-[#2a2a2a] text-white rounded-3xl px-5 py-4 shadow-xl text-sm max-w-[90vw] z-[10005]" aria-live="polite"></div>
+
+    <!-- Stats Modal -->
+    <div id="statsModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[10004]" data-overlay="true">
+      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-4xl w-full mx-4 border border-[#2a2a2a] max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-8 sticky top-0 bg-[#1a1a1a] pb-4 border-b border-[#2a2a2a]">
+          <h2 class="text-3xl font-bold text-[#57bb8a]">Harem Statistics</h2>
+          <button id="statsCloseBtn" class="text-4xl leading-none text-white hover:text-[#57bb8a]">×</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Characters</div>
+            <div class="stat-value" id="statTotalChars">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Locked Characters</div>
+            <div class="stat-value" id="statLockedChars">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Kakera</div>
+            <div class="stat-value" id="statTotalKakera">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Spheres</div>
+            <div class="stat-value" id="statTotalSp">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Unique Series</div>
+            <div class="stat-value" id="statUniqueSeries">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Characters with Notes</div>
+            <div class="stat-value" id="statWithNotes">0</div>
+          </div>
         </div>
 
-        <div class="space-y-12 text-[#cccccc]">
+        <div class="stats-section">
+          <h3>Most Valuable Characters</h3>
+          <div id="topCharacters" class="space-y-2"></div>
+        </div>
 
+        <div class="stats-section">
+          <h3>Perk Distribution</h3>
+          <div id="perkStats" class="space-y-2"></div>
+        </div>
+
+        <div class="stats-section">
+          <h3>Series Breakdown</h3>
+          <div class="series-list" id="seriesBreakdown"></div>
+        </div>
+
+        <div class="mt-8 text-center">
+          <button id="statsCloseBtnBottom" class="accent-btn px-12 py-4 rounded-2xl text-lg font-semibold">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpBox" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]" data-overlay="true">
+      <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-4xl w-full mx-4 border border-[#2a2a2a] max-h-[92vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-8 sticky top-0 bg-[#1a1a1a] pb-6 border-b border-[#2a2a2a]">
+          <h2 class="text-3xl font-bold">Mudae Harem Sorter v1.5.0 - Help</h2>
+          <button id="helpCloseBtn" class="text-4xl leading-none text-white hover:text-[#57bb8a]">×</button>
+        </div>
+        <div class="space-y-12 text-[#cccccc]">
           <div>
             <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">1.</span> Getting Started</h3>
             <p class="mb-3">In Mudae, use one of these commands to generate your export:</p>
@@ -270,41 +483,29 @@
               <li><code class="bg-[#111113] px-2 py-0.5 rounded">$mmai-k-z+z!s</code> — Base kakera values</li>
               <li><code class="bg-[#111113] px-2 py-0.5 rounded">$mmai-kz+z!s</code> — Key kakera values</li>
             </ul>
-            <p><strong>Important:</strong> Copy everything starting from the first series header (e.g. <code>Series Name - x/y</code>) down to the bottom. Do <strong>not</strong> include the total kakera line or harem name at the very top.</p>
-            
-            <p class="mt-4"><strong>Adding to an existing list:</strong> If you already have a sorted list saved, you can import a new export. The tool will detect existing characters and ask whether to <strong>Replace entire list</strong> or <strong>Add new characters to the bottom</strong>.</p>
+            <p><strong>Important:</strong> Copy everything starting from the first series header down to the bottom. Do <strong>not</strong> include the total kakera line or harem name at the very top.</p>
+            <p class="mt-4"><strong>Smart Merge:</strong> Updates kakera, spheres, perks, series, and notes. Prompts for image changes if needed.</p>
           </div>
-
           <div>
             <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">2.</span> The Grid & Controls</h3>
             <ul class="list-disc pl-6 space-y-3">
-              <li><strong>Drag & Drop</strong> — Freely reorder characters. Locked cards stay pinned at the top and cannot be dragged.</li>
-              <li><strong>Position Counter</strong> — Shows x/y position on every card.</li>
-              <li><strong>Ctrl + Click</strong> any card to copy the character name to clipboard.</li>
-              <li><strong>Per-card buttons (bottom row):</strong>
-                <ul class="list-disc pl-6 mt-2 space-y-1">
-                  <li><strong>↑</strong> — Move to bottom of locked section</li>
-                  <li><strong>↓</strong> — Move to very bottom</li>
-                  <li><strong>SERIES</strong> — Move all unlocked characters from the same series below the locked section</li>
-                  <li><strong>🔒 / 🔓</strong> — Lock this character + everything above it, or unlock this character + everything below it</li>
-                </ul>
-              </li>
+              <li><strong>Drag & Drop</strong> — Reorder freely. Locked cards stay pinned at the top.</li>
+              <li><strong>📸 Camera Icon</strong> — Hover image and click top-left camera to update picture.</li>
+              <li><strong>Ctrl + Click</strong> any card to copy character name.</li>
+              <li><strong>Bottom buttons:</strong> ▲ ▼ SERIES Lock/Unlock</li>
             </ul>
           </div>
-
           <div>
             <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">3.</span> Locking & Navigation</h3>
             <p class="mb-4"><strong>Locking System:</strong> Locked characters are protected at the top. Locking one character also locks everything above it.</p>
-            <p class="mb-4"><strong>Left Navigation Sidebar:</strong></p>
             <ul class="list-disc pl-6 space-y-2">
               <li><strong>↑ Go to Top</strong></li>
               <li><strong>🔒 End of Locked</strong> — Jump to the last locked character</li>
               <li><strong>↓ Go to Bottom</strong> — Jump to the end of your harem</li>
-              <li><strong>↩ Return to Last Position</strong> — Returns you to where you were before using any navigation button</li>
+              <li><strong>↩ Return to Last Position</strong></li>
               <li><strong>📜 Jump to Output</strong> — Scroll to the generated $sm commands</li>
             </ul>
           </div>
-
           <div>
             <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">4.</span> Sorting Options (Right Sidebar)</h3>
             <ul class="list-disc pl-6 space-y-2">
@@ -317,34 +518,29 @@
               <li><strong>Unlock All</strong> — Removes every lock</li>
             </ul>
           </div>
-
           <div>
-            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">5.</span> Notes System</h3>
-            <ul class="list-disc pl-6 space-y-3">
-              <li><strong>Green Note Pill</strong> — Click the green pill on any card to open the note editor.</li>
-              <li><strong>Quick Notes Setup</strong> — Click top <strong>📝 Note</strong> button → "Quick Notes Setup" to pre-fill your 8 reusable notes.</li>
-              <li><strong>Applying Notes</strong> — In the modal, pick a quick note or type a custom one, then click Confirm.</li>
-              <li><strong>Clear Note</strong> — Clear a single character's note from inside the pill modal.</li>
-              <li><strong>Clear All Notes</strong> — Available in the main Notes menu (requires confirmation).</li>
-              <li><strong>Note Export</strong> — In the Notes menu, enter the exact note text (case-sensitive), then generate multiple <code>$n name$name$name$yournote</code> strings ready for Mudae. Automatically split if too long.</li>
+            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">5.</span> Notes & Image Updates</h3>
+            <ul class="list-disc pl-6 space-y-2">
+              <li>Notes are preserved during smart merge and updated if changed in the new export.</li>
+              <li>Use the 📸 camera icon on any character image to manually update the picture.</li>
             </ul>
           </div>
-
           <div>
             <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">6.</span> Search</h3>
-            <p>The top search bar finds matches in character names, series names, <strong>or notes</strong>. Press Enter to jump to the best match.</p>
+            <p>The top search bar finds matches in character names, series names, notes, or SP values.</p>
           </div>
-
           <div>
             <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">7.</span> Generating $sm Commands</h3>
             <p>Click <strong>📋 $sm</strong> to create ready-to-paste Discord sorting commands. The output is automatically split into multiple boxes with proper <code>$smpos</code> chaining when needed. Use the copy button on each box.</p>
           </div>
-
+          <div>
+            <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-3"><span class="text-[#57bb8a]">8.</span> Harem Statistics</h3>
+            <p>Click <strong>📊 Stats</strong> to view comprehensive harem statistics including total kakera, perk distribution, series breakdown, and your most valuable characters.</p>
+          </div>
         </div>
-
         <div class="mt-12 text-center">
           <p class="text-[#57bb8a] font-medium mb-6">Thank you for using Mudae Harem Sorter!</p>
-          <button onclick="hideHelp()" class="accent-btn px-12 py-4 rounded-2xl text-lg font-semibold">Close Help</button>
+          <button id="helpCloseBtnBottom" class="accent-btn px-12 py-4 rounded-2xl text-lg font-semibold">Close Help</button>
         </div>
       </div>
     </div>
@@ -357,32 +553,30 @@
   </div>
 
   <!-- Notes Tools Modal -->
-  <div id="notesModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[999]">
+  <div id="notesModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[999]" data-overlay="true">
     <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-md w-full mx-4 border border-[#2a2a2a]">
       <h2 class="text-2xl font-semibold mb-6 text-center">Notes Tools</h2>
       <div class="flex flex-col gap-4">
-        <button onclick="openQuickNotesSetup()" class="accent-btn py-5 rounded-2xl text-lg font-semibold">Quick Notes Setup</button>
-        <button onclick="openNoteExportModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] py-5 rounded-2xl text-lg font-semibold">Note Export</button>
-        <button onclick="clearAllNotes()" class="bg-red-600 hover:bg-red-700 py-5 rounded-2xl text-lg font-semibold">Clear All Notes</button>
-        <button onclick="hideNotesModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] py-4 rounded-2xl text-lg">Close</button>
+        <button id="quickNotesSetupBtn" class="accent-btn py-5 rounded-2xl text-lg font-semibold">Quick Notes Setup</button>
+        <button id="noteExportBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] py-5 rounded-2xl text-lg font-semibold">Note Export</button>
+        <button id="clearNotesBtn" class="bg-red-600 hover:bg-red-700 py-5 rounded-2xl text-lg font-semibold">Clear All Notes</button>
+        <button id="notesCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] py-4 rounded-2xl text-lg">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- Quick Notes Setup Modal -->
-  <div id="quickNotesSetupModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[1000]">
+  <div id="quickNotesSetupModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[1000]" data-overlay="true">
     <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-lg w-full mx-4 border border-[#2a2a2a]">
       <h2 class="text-2xl font-semibold mb-6">Quick Notes Setup (8 slots)</h2>
       <div id="quickNotesInputs" class="space-y-3"></div>
       <div class="flex gap-4 mt-8">
-        <button onclick="saveQuickNotes()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Save Quick Notes</button>
-        <button onclick="hideQuickNotesSetupModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
+        <button id="saveQuickNotesBtn" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Save Quick Notes</button>
+        <button id="quickNotesCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Cancel</button>
       </div>
     </div>
   </div>
 
-  <!-- Note Apply Modal -->
-  <div id="noteApplyModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[1001]">
+  <div id="noteApplyModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[1001]" data-overlay="true">
     <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-md w-full mx-4 border border-[#2a2a2a]">
       <h2 class="text-2xl font-semibold mb-6 text-center">Apply Note</h2>
       <div class="grid grid-cols-2 gap-3 mb-6" id="quickNoteButtons"></div>
@@ -391,15 +585,14 @@
         <input id="customNoteInput" type="text" class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-[#57bb8a]" placeholder="Type custom note...">
       </div>
       <div class="flex gap-3">
-        <button onclick="applyNoteToCharacter()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Confirm</button>
-        <button onclick="clearCurrentNote()" class="bg-red-600 hover:bg-red-700 flex-1 py-4 rounded-2xl text-lg">Clear Note</button>
-        <button onclick="hideNoteApplyModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Close</button>
+        <button id="applyNoteBtn" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Confirm</button>
+        <button id="clearCurrentNoteBtn" class="bg-red-600 hover:bg-red-700 flex-1 py-4 rounded-2xl text-lg">Clear Note</button>
+        <button id="noteApplyCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- Note Generation Modal -->
-  <div id="noteExportModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[1002]">
+  <div id="noteExportModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[1002]" data-overlay="true">
     <div class="bg-[#1a1a1a] rounded-3xl p-8 max-w-2xl w-full mx-4 border border-[#2a2a2a]">
       <h2 class="text-2xl font-semibold mb-6 text-center">Generate $n Note Import Strings</h2>
       <div class="mb-6">
@@ -407,8 +600,8 @@
         <input id="noteExportInput" type="text" class="w-full bg-[#111113] border border-[#2a2a2a] rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-[#57bb8a]" placeholder="e.g. s9 or bunny">
       </div>
       <div class="flex gap-4 mb-8">
-        <button onclick="generateNoteExport()" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Generate $n Strings</button>
-        <button onclick="hideNoteExportModal()" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Close</button>
+        <button id="generateNoteExportBtn" class="accent-btn flex-1 py-4 rounded-2xl text-lg">Generate $n Strings</button>
+        <button id="noteExportCancelBtn" class="bg-[#2a2a2a] hover:bg-[#3a3a3a] flex-1 py-4 rounded-2xl text-lg">Close</button>
       </div>
       <div id="noteExportOutput" class="space-y-8 max-h-[60vh] overflow-y-auto"></div>
     </div>
@@ -422,12 +615,246 @@
     const SAVE_KEY = 'mudaeHaremSave';
     let pendingImportData = null;
     let quickNotes = ["", "", "", "", "", "", "", ""];
-    let currentEditingIndex = -1;
+    let currentEditingId = null;
+    let currentImageEditId = null;
+    let currentSeriesToLock = null;
+    let sortable = null;
+    let confirmAcceptCallback = null;
+    let confirmCancelCallback = null;
+    let toastTimer = null;
+    const modalStack = [];
 
-    // Quick Notes functions (unchanged)
+    function createUniqueId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return `char_${Math.random().toString(36).slice(2)}_${Date.now().toString(36)}`;
+    }
+
+    function ensureCharacterIds() {
+      characters.forEach(char => {
+        if (!char.id) char.id = createUniqueId();
+      });
+    }
+
+    function getCharacterIndexById(id) {
+      return characters.findIndex(c => c.id === id);
+    }
+
+    function getCharacterById(id) {
+      return characters.find(c => c.id === id);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function isPerk10Unlocked(perks) {
+      if (!perks) return false;
+      if (perks === "Full") return true;
+      return /(?:^|,)\s*10\s*(?:,|$)/.test(perks);
+    }
+
+    function isAllPerksMaxed(perks) {
+      return perks === "Full";
+    }
+
+    function updateBodyScrollLock() {
+      document.body.style.overflow = modalStack.length > 0 ? 'hidden' : '';
+    }
+
+    function showModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      if (!modalStack.includes(id)) modalStack.push(id);
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      updateBodyScrollLock();
+    }
+
+    function hideModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      const index = modalStack.indexOf(id);
+      if (index !== -1) modalStack.splice(index, 1);
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      updateBodyScrollLock();
+    }
+
+    function closeTopModal() {
+      if (!modalStack.length) return;
+      hideModal(modalStack[modalStack.length - 1]);
+    }
+
+    function showToast(message, duration = 2200) {
+      const toast = document.getElementById('toastMessage');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+        toastTimer = setTimeout(() => toast.classList.add('hidden'), 200);
+      }, duration);
+    }
+
+    function showConfirmDialog(title, message, onConfirm, onCancel) {
+      document.getElementById('confirmDialogTitle').textContent = title;
+      document.getElementById('confirmDialogMessage').textContent = message;
+      confirmAcceptCallback = typeof onConfirm === 'function' ? onConfirm : null;
+      confirmCancelCallback = typeof onCancel === 'function' ? onCancel : null;
+      showModal('confirmDialog');
+    }
+
+    function hideConfirmDialog() {
+      hideModal('confirmDialog');
+      confirmAcceptCallback = null;
+      confirmCancelCallback = null;
+    }
+
+    function confirmDialogAccept() {
+      if (confirmAcceptCallback) confirmAcceptCallback();
+      hideConfirmDialog();
+    }
+
+    function confirmDialogCancel() {
+      if (confirmCancelCallback) confirmCancelCallback();
+      hideConfirmDialog();
+    }
+
+    function calculateStats() {
+      if (characters.length === 0) {
+        return {
+          totalChars: 0,
+          lockedChars: 0,
+          totalKakera: 0,
+          totalSp: 0,
+          uniqueSeries: 0,
+          withNotes: 0,
+          topChars: [],
+          perkCounts: { full: 0, perk10: 0 },
+          seriesList: []
+        };
+      }
+
+      const totalChars = characters.length;
+      const lockedChars = lockedCount;
+      const totalKakera = characters.reduce((sum, c) => sum + (c.kakera || 0), 0);
+      const totalSp = characters.reduce((sum, c) => sum + (c.sp || 0), 0);
+      const withNotes = characters.filter(c => c.note && c.note.trim() !== "").length;
+      const uniqueSeries = new Set(characters.map(c => c.series)).size;
+
+      const perkCounts = { full: 0, perk10: 0 };
+      characters.forEach(c => {
+        if (isAllPerksMaxed(c.perks)) {
+          perkCounts.full++;
+          perkCounts.perk10++;
+        } else if (isPerk10Unlocked(c.perks)) {
+          perkCounts.perk10++;
+        }
+      });
+
+      const topChars = [...characters].sort((a, b) => b.kakera - a.kakera).slice(0, 5);
+
+      const seriesMap = {};
+      characters.forEach(c => {
+        if (!seriesMap[c.series]) {
+          seriesMap[c.series] = { count: 0, totalKakera: 0 };
+        }
+        seriesMap[c.series].count++;
+        seriesMap[c.series].totalKakera += c.kakera || 0;
+      });
+
+      const seriesList = Object.entries(seriesMap)
+        .map(([name, data]) => ({ name, ...data }))
+        .sort((a, b) => b.totalKakera - a.totalKakera);
+
+      return {
+        totalChars,
+        lockedChars,
+        totalKakera,
+        totalSp,
+        uniqueSeries,
+        withNotes,
+        topChars,
+        perkCounts,
+        seriesList
+      };
+    }
+
+    function showStatsModal() {
+      if (!requireCharactersLoaded()) return;
+      const stats = calculateStats();
+
+      document.getElementById('statTotalChars').textContent = stats.totalChars.toLocaleString();
+      document.getElementById('statLockedChars').textContent = stats.lockedChars.toLocaleString();
+      document.getElementById('statTotalKakera').textContent = stats.totalKakera.toLocaleString();
+      document.getElementById('statTotalSp').textContent = stats.totalSp.toLocaleString();
+      document.getElementById('statUniqueSeries').textContent = stats.uniqueSeries.toLocaleString();
+      document.getElementById('statWithNotes').textContent = stats.withNotes.toLocaleString();
+
+      const topCharContainer = document.getElementById('topCharacters');
+      topCharContainer.innerHTML = stats.topChars.map(c =>
+        `<div class="text-sm flex justify-between items-center p-2 bg-[#0f0f0f] rounded-lg">
+          <span>${escapeHtml(c.name)}</span>
+          <span class="text-[#57bb8a] font-bold">${c.kakera.toLocaleString()} ka</span>
+        </div>`
+      ).join('');
+
+      const perkContainer = document.getElementById('perkStats');
+      perkContainer.innerHTML = `
+        <div class="text-sm flex justify-between items-center p-2 bg-[#0f0f0f] rounded-lg">
+          <span>Perk 10 Unlocked (total, including fully maxed)</span>
+          <span class="text-[#57bb8a] font-bold">${stats.perkCounts.perk10}</span>
+        </div>
+        <div class="text-sm flex justify-between items-center p-2 bg-[#0f0f0f] rounded-lg">
+          <span>All Perks Fully Maxed</span>
+          <span class="text-[#57bb8a] font-bold">${stats.perkCounts.full}</span>
+        </div>
+      `;
+
+      const seriesContainer = document.getElementById('seriesBreakdown');
+      seriesContainer.innerHTML = stats.seriesList.map(s =>
+        `<div class="series-item">
+          <span class="series-name">${escapeHtml(s.name)}</span>
+          <span class="series-stats">${s.count} • ${s.totalKakera.toLocaleString()} ka</span>
+        </div>`
+      ).join('');
+
+      showModal('statsModal');
+    }
+
+    function hideStatsModal() { hideModal('statsModal'); }
+
+    function renderAndSave() {
+      renderGrid();
+      saveToLocalStorage();
+    }
+
+    function requireCharactersLoaded() {
+      if (!characters.length) {
+        showToast("Import your harem first!");
+        return false;
+      }
+      return true;
+    }
+
     function loadQuickNotes() {
       const saved = localStorage.getItem('mudaeQuickNotes');
-      if (saved) quickNotes = JSON.parse(saved);
+      if (!saved) return;
+      try {
+        const data = JSON.parse(saved);
+        if (Array.isArray(data) && data.length === 8 && data.every(item => typeof item === 'string')) {
+          quickNotes = data;
+        }
+      } catch (e) {
+        console.warn("Invalid quick notes data", e);
+      }
     }
 
     function saveQuickNotes() {
@@ -437,11 +864,11 @@
       }
       localStorage.setItem('mudaeQuickNotes', JSON.stringify(quickNotes));
       hideQuickNotesSetupModal();
-      alert("Quick notes saved!");
+      showToast("Quick notes saved!");
     }
 
-    function openNotesModal() { document.getElementById('notesModal').classList.remove('hidden'); }
-    function hideNotesModal() { document.getElementById('notesModal').classList.add('hidden'); }
+    function openNotesModal() { showModal('notesModal'); }
+    function hideNotesModal() { hideModal('notesModal'); }
 
     function openQuickNotesSetup() {
       hideNotesModal();
@@ -451,91 +878,106 @@
         const div = document.createElement('div');
         div.className = "flex items-center gap-3";
         div.innerHTML = `<span class="w-6 text-right font-mono text-[#57bb8a]">${i+1}.</span>
-          <input id="quickNote${i}" type="text" value="${quickNotes[i] || ''}" class="flex-1 bg-[#111113] border border-[#2a2a2a] rounded-2xl px-4 py-3 text-white">`;
+          <input id="quickNote${i}" type="text" value="${escapeHtml(quickNotes[i])}" class="flex-1 bg-[#111113] border border-[#2a2a2a] rounded-2xl px-4 py-3 text-white">`;
         container.appendChild(div);
       }
-      document.getElementById('quickNotesSetupModal').classList.remove('hidden');
+      showModal('quickNotesSetupModal');
     }
-    function hideQuickNotesSetupModal() { document.getElementById('quickNotesSetupModal').classList.add('hidden'); }
+    function hideQuickNotesSetupModal() { hideModal('quickNotesSetupModal'); }
 
     function clearAllNotes() {
-      if (!confirm("Clear the note field for ALL characters? This cannot be undone.")) return;
-      characters.forEach(char => char.note = "");
-      hideNotesModal();
-      renderGrid();
-      saveToLocalStorage();
-      alert("All notes cleared.");
+      showConfirmDialog(
+        "Clear All Notes",
+        "Clear the note field for ALL characters? This cannot be undone.",
+        () => {
+          characters.forEach(char => char.note = "");
+          hideNotesModal();
+          renderAndSave();
+          showToast("All notes cleared.");
+        }
+      );
     }
 
-    function editNote(index) {
-      currentEditingIndex = index;
-      const char = characters[index];
+    function editNoteById(charId) {
+      currentEditingId = charId;
+      const char = getCharacterById(charId);
+      if (!char) return;
       const container = document.getElementById('quickNoteButtons');
       container.innerHTML = '';
       for (let i = 0; i < 8; i++) {
         const btn = document.createElement('button');
+        btn.type = "button";
         btn.className = `py-3 rounded-2xl text-sm font-medium ${quickNotes[i] ? 'accent-btn' : 'bg-[#2a2a2a] text-gray-500 cursor-not-allowed'}`;
         btn.textContent = quickNotes[i] || '(empty)';
         btn.disabled = !quickNotes[i];
         if (quickNotes[i]) {
-          btn.onclick = () => {
+          btn.addEventListener('click', () => {
             char.note = quickNotes[i];
             hideNoteApplyModal();
-            renderGrid();
-            saveToLocalStorage();
-          };
+            renderAndSave();
+          });
         }
         container.appendChild(btn);
       }
       document.getElementById('customNoteInput').value = char.note || '';
-      document.getElementById('noteApplyModal').classList.remove('hidden');
+      showModal('noteApplyModal');
     }
 
     function hideNoteApplyModal() {
-      document.getElementById('noteApplyModal').classList.add('hidden');
-      currentEditingIndex = -1;
+      hideModal('noteApplyModal');
+      currentEditingId = null;
     }
 
     function applyNoteToCharacter() {
-      if (currentEditingIndex === -1) return;
-      const char = characters[currentEditingIndex];
+      if (!currentEditingId) return;
+      const char = getCharacterById(currentEditingId);
+      if (!char) return;
       const custom = document.getElementById('customNoteInput').value.trim();
       if (custom) {
         char.note = custom;
         hideNoteApplyModal();
-        renderGrid();
-        saveToLocalStorage();
+        renderAndSave();
+        showToast("Note applied.");
       } else {
-        alert("Please enter a custom note or select a quick note.");
+        showToast("Please enter a custom note or select a quick note.");
       }
     }
 
     function clearCurrentNote() {
-      if (currentEditingIndex === -1) return;
-      if (confirm("Clear this character's note?")) {
-        characters[currentEditingIndex].note = "";
-        hideNoteApplyModal();
-        renderGrid();
-        saveToLocalStorage();
-      }
+      if (!currentEditingId) return;
+      showConfirmDialog(
+        "Clear Note",
+        "Clear this character's note?",
+        () => {
+          const char = getCharacterById(currentEditingId);
+          if (char) char.note = "";
+          hideNoteApplyModal();
+          renderAndSave();
+          showToast("Note cleared.");
+        }
+      );
     }
 
     function openNoteExportModal() {
       hideNotesModal();
       document.getElementById('noteExportInput').value = '';
       document.getElementById('noteExportOutput').innerHTML = '';
-      document.getElementById('noteExportModal').classList.remove('hidden');
+      showModal('noteExportModal');
     }
 
     function hideNoteExportModal() {
-      document.getElementById('noteExportModal').classList.add('hidden');
+      hideModal('noteExportModal');
+    }
+
+    function getNoteExportLength(names, noteText) {
+      return `$n ${names.join('$')}$${noteText}`.length;
     }
 
     function generateNoteExport() {
       const noteText = document.getElementById('noteExportInput').value.trim();
-      if (!noteText) return alert("Please enter the exact note text to match (case-sensitive).");
+      if (!noteText) return showToast("Please enter the exact note text to match (case-sensitive).");
       const matchingChars = characters.filter(c => c.note === noteText);
-      if (matchingChars.length === 0) return alert(`No characters found with the exact note: "${noteText}"`);
+      if (matchingChars.length === 0) return showToast(`No characters found with the exact note: "${noteText}"`);
 
       const container = document.getElementById('noteExportOutput');
       container.innerHTML = '';
@@ -545,15 +987,18 @@
 
       matchingChars.forEach(char => {
         const name = char.name;
-        const testStr = currentBox.length === 0 ? `$n ${name}` : `$${name}`;
-        if (currentBox.length > 0 && (currentBox.join('$').length + testStr.length > MAX_CHARS)) {
+        const proposed = [...currentBox, name];
+        if (currentBox.length > 0 && getNoteExportLength(proposed, noteText) > MAX_CHARS) {
           createNoteBox(boxNumber, currentBox, noteText);
           boxNumber++;
-          currentBox = [];
+          currentBox = [name];
+        } else {
+          currentBox.push(name);
         }
-        currentBox.push(name);
       });
+
       if (currentBox.length > 0) createNoteBox(boxNumber, currentBox, noteText);
+      showToast("Note export generated.");
     }
 
     function createNoteBox(boxNum, names, noteText) {
@@ -567,18 +1012,16 @@
             <h3 class="font-semibold text-lg text-[#57bb8a]">Box ${boxNum}</h3>
             <p class="text-sm text-[#aaaaaa]">${names.length} characters</p>
           </div>
-          <button onclick="copyThisBox(this)" class="accent-btn px-6 py-2 rounded-2xl text-sm">📋 Copy Box</button>
+          <button type="button" class="copy-box-btn accent-btn px-6 py-2 rounded-2xl text-sm">📋 Copy Box</button>
         </div>
-        <pre class="bg-[#111113] p-5 rounded-2xl font-mono text-sm whitespace-pre-wrap overflow-auto">${command}</pre>
+        <pre class="bg-[#111113] p-5 rounded-2xl font-mono text-sm whitespace-pre-wrap overflow-auto">${escapeHtml(command)}</pre>
       `;
       container.appendChild(div);
     }
 
     function saveToLocalStorage() {
-      try {
-        const saveData = { version: "1.4.2", timestamp: Date.now(), lockedCount, characters };
-        localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
-      } catch (e) { console.warn("Auto-save failed", e); }
+      const saveData = { version: "1.5.0", timestamp: Date.now(), lockedCount, characters };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
     }
 
     function loadFromLocalStorage() {
@@ -588,6 +1031,7 @@
         const data = JSON.parse(saved);
         if (data.characters && Array.isArray(data.characters)) {
           characters = data.characters;
+          ensureCharacterIds();
           lockedCount = Math.min(data.lockedCount || 0, characters.length);
           return true;
         }
@@ -598,27 +1042,29 @@
     function showSavePopup() {
       const date = new Date().toISOString().slice(0,10);
       document.getElementById('saveFilename').value = `mudae-harem-save-${date}.json`;
-      document.getElementById('savePopup').classList.remove('hidden');
+      showModal('savePopup');
     }
-    function hideSavePopup() { document.getElementById('savePopup').classList.add('hidden'); }
+    function hideSavePopup() { hideModal('savePopup'); }
 
     function performSave() {
-      let filename = document.getElementById('saveFilename').value.trim() || `mudae-harem-save-${new Date().toISOString().slice(0,10)}.json`;
-      if (!characters.length) return alert("Nothing to save.");
-      const saveData = { version: "1.4.2", timestamp: Date.now(), lockedCount, characters };
+      const filename = document.getElementById('saveFilename').value.trim() || `mudae-harem-save-${new Date().toISOString().slice(0,10)}.json`;
+      if (!characters.length) return showToast("Nothing to save.");
+      const saveData = { version: "1.5.0", timestamp: Date.now(), lockedCount, characters };
       const blob = new Blob([JSON.stringify(saveData, null, 2)], {type: 'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url; a.download = filename; a.click();
       URL.revokeObjectURL(url);
       hideSavePopup();
+      showToast("Save downloaded.");
     }
 
     function showSaveImportBox() {
-      document.getElementById('saveImportBox').classList.remove('hidden');
       document.getElementById('savePasteText').value = '';
+      document.getElementById('saveFileInput').value = '';
+      showModal('saveImportBox');
     }
-    function hideSaveImportBox() { document.getElementById('saveImportBox').classList.add('hidden'); }
+    function hideSaveImportBox() { hideModal('saveImportBox'); }
 
     function handleSaveFileUpload(e) {
       const file = e.target.files[0];
@@ -629,47 +1075,56 @@
           const data = JSON.parse(ev.target.result);
           if (data.characters && Array.isArray(data.characters)) {
             characters = data.characters;
+            ensureCharacterIds();
             lockedCount = Math.min(data.lockedCount || 0, characters.length);
-            renderGrid();
-            saveToLocalStorage();
+            renderAndSave();
             hideSaveImportBox();
-            alert(`✅ Loaded ${characters.length} characters from save.`);
+            showToast(`✅ Loaded ${characters.length} characters from save.`);
+          } else {
+            showToast("Invalid save file.");
           }
-        } catch (err) { alert("Invalid save file."); }
+        } catch (err) {
+          showToast("Invalid save file.");
+        } finally {
+          e.target.value = '';
+        }
       };
       reader.readAsText(file);
     }
 
     function importSaveFromPaste() {
       const text = document.getElementById('savePasteText').value.trim();
-      if (!text) return alert("Paste save data first.");
+      if (!text) return showToast("Paste save data first.");
       try {
         const data = JSON.parse(text);
         if (data.characters && Array.isArray(data.characters)) {
           characters = data.characters;
+          ensureCharacterIds();
           lockedCount = Math.min(data.lockedCount || 0, characters.length);
-          renderGrid();
-          saveToLocalStorage();
+          renderAndSave();
           hideSaveImportBox();
-          alert(`✅ Loaded ${characters.length} characters from paste.`);
+          showToast(`✅ Loaded ${characters.length} characters from paste.`);
+        } else {
+          showToast("Invalid JSON.");
         }
-      } catch { alert("Invalid JSON."); }
+      } catch {
+        showToast("Invalid JSON.");
+      }
     }
 
-    function showImportBox() { document.getElementById('importBox').classList.remove('hidden'); }
-    function hideImportBox() { 
-      document.getElementById('importBox').classList.add('hidden'); 
-      document.getElementById('importText').value = ''; 
+    function showImportBox() { showModal('importBox'); }
+    function hideImportBox() {
+      hideModal('importBox');
+      document.getElementById('importText').value = '';
     }
 
     function hideChoiceModal() {
-      document.getElementById('choiceModal').classList.add('hidden');
+      hideModal('choiceModal');
       pendingImportData = null;
     }
 
-    // Parser
     function parseCharacters(text) {
-      let parsed = [];
+      const parsed = [];
       let currentSeries = "Unknown";
       text = text.replace(/\r\n?/g, '\n').trim();
       const lines = text.split('\n');
@@ -680,7 +1135,7 @@
 
         const headerMatch = line.match(/^(?:\d+\.\s*)?(.+?)\s*-\s*\d+\/\d+/);
         if (headerMatch) {
-          let potential = headerMatch[1].trim();
+          const potential = headerMatch[1].trim();
           const lower = potential.toLowerCase();
           if (lower.includes("dungeon ni deai") || lower.includes("danmachi")) {
             currentSeries = "Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka";
@@ -699,7 +1154,7 @@
 
         let sp = null;
         const spMatch = line.match(/(\d{1,6}(?:,\d{3})?)\s*sp/i);
-        if (spMatch) sp = parseInt(spMatch[1].replace(/,/g, ''));
+        if (spMatch) sp = parseInt(spMatch[1].replace(/,/g, ''), 10);
 
         let perks = "";
         const perkMatch = line.match(/sp\s*-\s*([^-\n]+?)\s*-\s*https/i);
@@ -722,111 +1177,193 @@
         namePart = namePart.replace(/^\d+\/\d+\s+/, '').trim();
         namePart = namePart.replace(/^.*:\s*/, '').trim();
 
-        if (namePart.toLowerCase() === "hourei tenten" || namePart.toLowerCase() === "hourei tenen") namePart = "Hourei Tenten";
+        const normalized = namePart.toLowerCase();
+        if (normalized === "hourei tenten" || normalized === "hourei tenen") namePart = "Hourei Tenten";
 
         if (namePart) {
           parsed.push({
+            id: createUniqueId(),
             name: namePart,
-            note: note,
+            note,
             series: currentSeries,
             imageUrl: urlMatch[1],
-            kakera: parseInt(kakeraMatch[1].replace(/,/g, '')),
-            sp: sp,
-            perks: perks
+            kakera: parseInt(kakeraMatch[1].replace(/,/g, ''), 10),
+            sp,
+            perks
           });
         }
       }
       return parsed;
     }
 
-    function doImport(text) {
-      characters = parseCharacters(text);
-      lockedCount = 0;
-      hideImportBox();
-      renderGrid();
-      saveToLocalStorage();
-      alert(`✅ Imported ${characters.length} waifus!`);
-    }
-
     function performImport() {
       const text = document.getElementById('importText').value.trim();
-      if (!text) return alert("Please paste your Mudae export!");
-      pendingImportData = text;
-      if (characters.length === 0) doImport(text);
-      else document.getElementById('choiceModal').classList.remove('hidden');
+      if (!text) return showToast("Please paste your Mudae export!");
+      pendingImportData = parseCharacters(text);
+      if (characters.length === 0) {
+        characters = pendingImportData;
+        lockedCount = 0;
+        hideImportBox();
+        renderAndSave();
+        showToast(`✅ Imported ${characters.length} waifus!`);
+      } else {
+        showModal('choiceModal');
+      }
     }
 
     function replaceList() {
-      doImport(pendingImportData);
+      characters = pendingImportData;
+      lockedCount = 0;
       hideChoiceModal();
       hideImportBox();
-      alert(`✅ Replaced with ${characters.length} waifus!`);
+      renderAndSave();
+      showToast(`✅ Replaced with ${characters.length} waifus!`);
     }
 
     function addToBottom() {
-      const newChars = parseCharacters(pendingImportData);
-      const existingNames = new Set(characters.map(c => c.name.toLowerCase().trim()));
-      let added = 0;
-      newChars.forEach(char => {
-        if (!existingNames.has(char.name.toLowerCase().trim())) {
-          characters.push(char);
-          added++;
+      const newChars = pendingImportData;
+      let updated = 0;
+      const imageUpdates = [];
+
+      newChars.forEach(newChar => {
+        const existingIndex = characters.findIndex(c =>
+          c.name.toLowerCase().trim() === newChar.name.toLowerCase().trim()
+        );
+        if (existingIndex !== -1) {
+          const existing = characters[existingIndex];
+          existing.kakera = newChar.kakera;
+          existing.sp = newChar.sp;
+          existing.perks = newChar.perks;
+          existing.series = newChar.series;
+          if (newChar.note !== existing.note) existing.note = newChar.note;
+          if (newChar.imageUrl !== existing.imageUrl) {
+            imageUpdates.push({index: existingIndex, newUrl: newChar.imageUrl});
+          }
+          updated++;
+        } else {
+          characters.push(newChar);
         }
       });
-      hideChoiceModal();
-      hideImportBox();
-      renderGrid();
-      saveToLocalStorage();
-      alert(`✅ Added ${added} new characters to the bottom!`);
+
+      const finishMerge = () => {
+        hideChoiceModal();
+        hideImportBox();
+        renderAndSave();
+        showToast(`✅ Merge complete: ${updated} updated, ${newChars.length - updated} new.`);
+      };
+
+      if (imageUpdates.length > 0) {
+        showConfirmDialog(
+          "Update Images?",
+          `Detected ${imageUpdates.length} character(s) with new images.\n\nUpdate all images?`,
+          () => {
+            imageUpdates.forEach(update => characters[update.index].imageUrl = update.newUrl);
+            finishMerge();
+          },
+          finishMerge
+        );
+      } else {
+        finishMerge();
+      }
     }
 
     function renderGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
+      const fragment = document.createDocumentFragment();
       const total = characters.length;
 
       characters.forEach((char, index) => {
         const isLocked = index < lockedCount;
         const card = document.createElement('div');
-        card.className = `card bg-[#1a1a1a] rounded-3xl overflow-hidden border border-[#2a2a2a] w-fit flex flex-col ${isLocked ? 'locked' : 'cursor-move'} relative`;
+        card.className = `card bg-[#1a1a1a] rounded-3xl overflow-hidden border border-[#2a2a2a] flex flex-col ${isLocked ? 'locked' : 'cursor-move'}`;
+        card.dataset.characterId = char.id;
+        card.dataset.characterName = char.name;
+        card.dataset.characterSeries = char.series;
+        card.dataset.characterSp = char.sp != null ? char.sp : 0;
+        card.dataset.characterNote = char.note || '';
+        card.dataset.characterPerks = char.perks || '';
+        card.dataset.characterKakera = char.kakera != null ? char.kakera : 0;
 
         const spText = char.sp != null ? `${char.sp.toLocaleString()} sp` : '0 sp';
         const perkDisplay = char.perks === "Full" ? "All Perks Maxed" : (char.perks ? char.perks : "No perks");
 
         card.innerHTML = `
+          <div class="character-img-container">
+            <img src="${escapeHtml(char.imageUrl)}" class="character-img" loading="lazy" onerror="this.src='https://via.placeholder.com/420x380/1f1f1f/ffffff?text=No+Image'">
+            <div type="button" data-action="edit-image" data-char-id="${escapeHtml(char.id)}" class="image-update-btn">📸</div>
+          </div>
           <div class="position-counter">${index + 1}/${total}</div>
-          <img src="${char.imageUrl}" class="character-img" onerror="this.src='https://via.placeholder.com/420x380/1f1f1f/ffffff?text=No+Image'">
-          <div class="card-content p-4 text-center flex-1 flex flex-col">
-            <div class="font-semibold text-lg leading-tight name-on-card">${char.name}</div>
-            <div class="text-[#57bb8a] font-medium mt-3">${char.kakera.toLocaleString()} ka</div>
-            <div class="text-[#57bb8a] font-medium">${spText}</div>
-            <div class="text-xs text-gray-400 mt-1">${perkDisplay}</div>
-            <div class="text-sm mt-3">${char.series}</div>
-            <div onclick="editNote(${index}); event.stopImmediatePropagation()" class="note-pill mx-auto">
-              📝 ${char.note ? char.note : 'Add note'}
+          <div class="card-content px-4 pt-3 pb-3 text-center flex flex-col flex-1">
+            <div class="font-semibold text-lg leading-tight name-on-card">${escapeHtml(char.name)}</div>
+            <div class="text-[#57bb8a] font-medium mt-1">${char.kakera.toLocaleString()} ka • ${spText}</div>
+            <div class="text-xs text-gray-400 mt-0.5">${escapeHtml(perkDisplay)}</div>
+            <div class="text-sm mt-2 break-words text-white">${escapeHtml(char.series)}</div>
+            <div type="button" data-action="edit-note" data-char-id="${escapeHtml(char.id)}" class="note-pill mx-auto mt-auto">
+              📝 ${escapeHtml(char.note ? char.note : 'Add note')}
             </div>
           </div>
           <div class="button-row">
-            <button onclick="moveUp(${index}); event.stopImmediatePropagation();" class="py-2.5 text-lg font-medium rounded-2xl bg-[#2a2a2a] hover:bg-[#3a3a3a] ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}">↑</button>
-            <button onclick="moveDown(${index}); event.stopImmediatePropagation();" class="py-2.5 text-lg font-medium rounded-2xl bg-[#2a2a2a] hover:bg-[#3a3a3a] ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}">↓</button>
-            <button onclick="moveSeriesToLocked('${char.series.replace(/'/g, "\\'")}'); event.stopImmediatePropagation();" class="py-2.5 text-sm font-medium rounded-2xl bg-[#2a2a2a] hover:bg-[#3a3a3a] ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}">SERIES</button>
-            <button onclick="toggleLock('${char.name.replace(/'/g, "\\'")}'); event.stopImmediatePropagation();" class="py-2.5 text-lg font-medium rounded-2xl ${isLocked ? 'bg-[#57bb8a] hover:bg-[#4aa57a] text-black' : 'bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white'}">${isLocked ? '🔓' : '🔒'}</button>
+            <button type="button" data-action="move-up" data-char-id="${escapeHtml(char.id)}" class="accent-btn">▲</button>
+            <button type="button" data-action="move-down" data-char-id="${escapeHtml(char.id)}" class="accent-btn">▼</button>
+            <button type="button" data-action="move-series" data-series="${escapeHtml(char.series)}" class="accent-btn text-xs">SERIES</button>
+            <button type="button" data-action="toggle-lock" data-char-id="${escapeHtml(char.id)}" class="accent-btn">${isLocked ? '🔓' : '🔒'}</button>
           </div>
         `;
-        grid.appendChild(card);
-
-        card.addEventListener('click', function(e) {
-          if (e.ctrlKey || e.metaKey) {
-            e.preventDefault();
-            navigator.clipboard.writeText(char.name).then(() => {
-              card.style.border = '3px solid #57bb8a';
-              setTimeout(() => card.style.border = '', 600);
-            });
-          }
-        });
+        fragment.appendChild(card);
       });
 
-      new Sortable(grid, {
+      grid.appendChild(fragment);
+    }
+
+    function handleGridClick(event) {
+      const grid = document.getElementById('grid');
+      const card = event.target.closest('.card');
+      if (!card || !grid.contains(card)) return;
+
+      const actionTarget = event.target.closest('[data-action]');
+      if (!actionTarget) {
+        if ((event.ctrlKey || event.metaKey) && card.dataset.characterName) {
+          event.preventDefault();
+          navigator.clipboard.writeText(card.dataset.characterName).then(() => {
+            card.style.border = '3px solid #57bb8a';
+            setTimeout(() => card.style.border = '', 600);
+          });
+        }
+        return;
+      }
+
+      event.stopPropagation();
+      const action = actionTarget.dataset.action;
+      const charId = actionTarget.dataset.charId;
+      const seriesName = actionTarget.dataset.series;
+
+      switch (action) {
+        case 'edit-image':
+          if (charId) showImageModal(charId);
+          break;
+        case 'edit-note':
+          if (charId) editNoteById(charId);
+          break;
+        case 'move-up':
+          if (charId) moveUpById(charId);
+          break;
+        case 'move-down':
+          if (charId) moveDownById(charId);
+          break;
+        case 'move-series':
+          if (seriesName) showSeriesConfirmModal(seriesName);
+          break;
+        case 'toggle-lock':
+          if (charId) toggleLock(charId);
+          break;
+      }
+    }
+
+    function initSortable() {
+      const grid = document.getElementById('grid');
+      if (sortable) sortable.destroy();
+      sortable = Sortable.create(grid, {
         animation: 150,
         ghostClass: "sortable-ghost",
         dragClass: "sortable-drag",
@@ -835,24 +1372,80 @@
         onMove: evt => !evt.related.classList.contains('locked'),
         onEnd: () => {
           const newOrder = Array.from(grid.children).map(card => {
-            const name = card.querySelector('.name-on-card').textContent.trim();
-            return characters.find(c => c.name === name);
+            const id = card.dataset.characterId;
+            return characters.find(c => c.id === id);
           }).filter(Boolean);
           characters = newOrder;
-          renderGrid();
-          saveToLocalStorage();
+          renderAndSave();
         }
       });
     }
 
-    // Sort functions (unchanged except spheres tie-breaker already improved)
+    function showImageModal(charId) {
+      currentImageEditId = charId;
+      const char = getCharacterById(charId);
+      document.getElementById('imageUrlInput').value = char ? (char.imageUrl || '') : '';
+      showModal('imageModal');
+    }
+
+    function hideImageModal() {
+      hideModal('imageModal');
+      currentImageEditId = null;
+    }
+
+    function applyImageUpdate() {
+      if (!currentImageEditId) return;
+      const index = getCharacterIndexById(currentImageEditId);
+      if (index === -1) return;
+      const newUrl = document.getElementById('imageUrlInput').value.trim();
+      if (!newUrl) return showToast("Please enter a valid image URL.");
+      characters[index].imageUrl = newUrl;
+      renderAndSave();
+      hideImageModal();
+      showToast("Image updated.");
+    }
+
+    function showSeriesConfirmModal(seriesName) {
+      currentSeriesToLock = seriesName;
+      document.getElementById('seriesConfirmName').textContent = seriesName;
+      showModal('seriesConfirmModal');
+    }
+
+    function hideSeriesConfirmModal() {
+      hideModal('seriesConfirmModal');
+      currentSeriesToLock = null;
+    }
+
+    function confirmMoveSeriesToLocked() {
+      if (!currentSeriesToLock) return hideSeriesConfirmModal();
+      moveSeriesToLocked(currentSeriesToLock);
+      hideSeriesConfirmModal();
+      showToast("Series moved under locked section.");
+    }
+
+    function moveUpById(charId) {
+      const index = getCharacterIndexById(charId);
+      if (index === -1 || index < lockedCount) return;
+      const char = characters.splice(index, 1)[0];
+      characters.splice(lockedCount, 0, char);
+      renderAndSave();
+    }
+
+    function moveDownById(charId) {
+      const index = getCharacterIndexById(charId);
+      if (index === -1 || index >= characters.length - 1) return;
+      const char = characters.splice(index, 1)[0];
+      characters.push(char);
+      renderAndSave();
+    }
+
     function sortByName() {
-      if (!characters.length) return alert("Import your harem first!");
+      if (!requireCharactersLoaded()) return;
       toggleSort('name', (a, b) => a.name.localeCompare(b.name));
     }
 
     function sortBySeries() {
-      if (!characters.length) return alert("Import your harem first!");
+      if (!requireCharactersLoaded()) return;
       toggleSort('series', (a, b) => {
         if (a.series !== b.series) return a.series.localeCompare(b.series);
         return b.kakera - a.kakera;
@@ -860,12 +1453,12 @@
     }
 
     function sortByKakera() {
-      if (!characters.length) return alert("Import your harem first!");
+      if (!requireCharactersLoaded()) return;
       toggleSort('kakera', (a, b) => b.kakera - a.kakera);
     }
 
     function sortBySpheres() {
-      if (!characters.length) return alert("Import your harem first!");
+      if (!requireCharactersLoaded()) return;
       toggleSort('sp', (a, b) => {
         if ((b.sp || 0) !== (a.sp || 0)) return (b.sp || 0) - (a.sp || 0);
         if (b.kakera !== a.kakera) return b.kakera - a.kakera;
@@ -874,11 +1467,11 @@
     }
 
     function sortByNote() {
-      if (!characters.length) return alert("Import your harem first!");
-      let locked = characters.slice(0, lockedCount);
-      let unlocked = characters.slice(lockedCount);
-      let withNotes = unlocked.filter(c => c.note && c.note.trim() !== "");
-      let withoutNotes = unlocked.filter(c => !c.note || c.note.trim() === "");
+      if (!requireCharactersLoaded()) return;
+      const locked = characters.slice(0, lockedCount);
+      const unlocked = characters.slice(lockedCount);
+      const withNotes = unlocked.filter(c => c.note && c.note.trim() !== "");
+      const withoutNotes = unlocked.filter(c => !c.note || c.note.trim() === "");
 
       withNotes.sort((a, b) => {
         if (a.note !== b.note) return a.note.localeCompare(b.note);
@@ -887,8 +1480,7 @@
       withoutNotes.sort((a, b) => a.name.localeCompare(b.name));
 
       characters = [...locked, ...withNotes, ...withoutNotes];
-      renderGrid();
-      saveToLocalStorage();
+      renderAndSave();
     }
 
     function toggleSort(field, comparator) {
@@ -898,73 +1490,60 @@
         currentSort.field = field;
         currentSort.direction = 'asc';
       }
-      let unlocked = characters.slice(lockedCount);
+      const unlocked = characters.slice(lockedCount);
       unlocked.sort(comparator);
       if (currentSort.direction === 'desc') unlocked.reverse();
       characters = [...characters.slice(0, lockedCount), ...unlocked];
-      renderGrid();
-      saveToLocalStorage();
+      renderAndSave();
     }
 
-    // Remaining helper functions (moveUp, moveDown, toggleLock, etc.) - unchanged from previous version
     function moveSeriesToLocked(seriesName) {
       if (!seriesName || seriesName === "Unknown") return;
       const unlockedSeriesChars = characters.slice(lockedCount).filter(c => c.series === seriesName);
       if (unlockedSeriesChars.length === 0) return;
-      if (!confirm(`Move all ${unlockedSeriesChars.length} unlocked characters from "${seriesName}" below the locked section?`)) return;
-
       characters = characters.filter((c, idx) => !(idx >= lockedCount && c.series === seriesName));
       characters.splice(lockedCount, 0, ...unlockedSeriesChars);
-      renderGrid();
-      saveToLocalStorage();
+      renderAndSave();
     }
 
-    function moveUp(index) {
-      if (index < lockedCount) return;
-      const char = characters.splice(index, 1)[0];
-      characters.splice(lockedCount, 0, char);
-      renderGrid();
-      saveToLocalStorage();
-    }
-
-    function moveDown(index) {
-      if (index >= characters.length - 1) return;
-      const char = characters.splice(index, 1)[0];
-      characters.push(char);
-      renderGrid();
-      saveToLocalStorage();
-    }
-
-    function toggleLock(name) {
-      const idx = characters.findIndex(c => c.name === name);
+    function toggleLock(id) {
+      const idx = characters.findIndex(c => c.id === id);
       if (idx === -1) return;
       lockedCount = (idx < lockedCount) ? idx : idx + 1;
-      renderGrid();
-      saveToLocalStorage();
+      renderAndSave();
     }
 
     function shuffleUnlocked() {
       if (characters.length <= lockedCount + 1) return;
-      let unlocked = characters.slice(lockedCount);
+      const unlocked = characters.slice(lockedCount);
       for (let i = unlocked.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [unlocked[i], unlocked[j]] = [unlocked[j], unlocked[i]];
       }
       characters = [...characters.slice(0, lockedCount), ...unlocked];
-      renderGrid();
-      saveToLocalStorage();
+      renderAndSave();
     }
 
     function unlockAll() {
-      if (confirm("Unlock ALL characters?")) {
-        lockedCount = 0;
-        renderGrid();
-        saveToLocalStorage();
-      }
+      showConfirmDialog(
+        "Unlock All Characters",
+        "Unlock ALL characters?",
+        () => {
+          lockedCount = 0;
+          renderAndSave();
+          showToast("All characters unlocked.");
+        }
+      );
+    }
+
+    function getCommandLength(names, prevAnchor, isFirst) {
+      return isFirst
+        ? `$sm ${names.join('$')}`.length
+        : `$smpos ${prevAnchor}$${names.join('$')}`.length;
     }
 
     function generateCommands() {
-      if (!characters.length) return alert("Import your harem first!");
+      if (!requireCharactersLoaded()) return;
       const outputContainer = document.getElementById('outputBoxes');
       outputContainer.innerHTML = '';
       document.getElementById('commandsOutput').classList.remove('hidden');
@@ -976,21 +1555,25 @@
 
       for (const char of characters) {
         const name = char.name;
-        const testStr = currentBox.length === 0 ? `$sm ${name}` : `$${name}`;
-        if (currentBox.length > 0 && (currentBox.join('$').length + testStr.length > MAX_CHARS)) {
+        const proposed = [...currentBox, name];
+        if (currentBox.length > 0 && getCommandLength(proposed, prevAnchor, boxNumber === 1) > MAX_CHARS) {
           createCommandBox(boxNumber, currentBox, prevAnchor);
           boxNumber++;
           prevAnchor = currentBox[currentBox.length - 1];
-          currentBox = [];
+          currentBox = [name];
+        } else {
+          currentBox.push(name);
         }
-        currentBox.push(name);
       }
       if (currentBox.length > 0) createCommandBox(boxNumber, currentBox, prevAnchor);
+      showToast("Commands generated.");
     }
 
     function createCommandBox(boxNum, boxChars, prevAnchor) {
       const container = document.getElementById('outputBoxes');
-      let command = boxNum === 1 ? `$sm ${boxChars.join('$')}` : `$smpos ${prevAnchor}$${boxChars.join('$')}`;
+      const command = boxNum === 1
+        ? `$sm ${boxChars.join('$')}`
+        : `$smpos ${prevAnchor}$${boxChars.join('$')}`;
       const count = boxChars.length;
 
       const div = document.createElement('div');
@@ -1001,15 +1584,16 @@
             <h3 class="font-semibold text-lg text-[#57bb8a]">Box ${boxNum}</h3>
             <p class="text-sm text-[#aaaaaa]">${count} characters</p>
           </div>
-          <button onclick="copyThisBox(this)" class="accent-btn px-6 py-2 rounded-2xl text-sm">📋 Copy Box</button>
+          <button type="button" class="copy-box-btn accent-btn px-6 py-2 rounded-2xl text-sm">📋 Copy Box</button>
         </div>
-        <pre class="bg-[#111113] p-5 rounded-2xl font-mono text-sm whitespace-pre-wrap overflow-auto max-h-64">${command}</pre>
+        <pre class="bg-[#111113] p-5 rounded-2xl font-mono text-sm whitespace-pre-wrap overflow-auto max-h-64">${escapeHtml(command)}</pre>
       `;
       container.appendChild(div);
     }
 
     function copyThisBox(btn) {
-      const pre = btn.parentElement.parentElement.querySelector('pre');
+      const pre = btn.closest('div').parentElement.querySelector('pre');
+      if (!pre) return;
       navigator.clipboard.writeText(pre.textContent).then(() => {
         const original = btn.textContent;
         btn.textContent = "✅ Copied!";
@@ -1018,16 +1602,20 @@
     }
 
     function clearAll() {
-      if (confirm("Clear everything (harem, locks, output, AND quick note slots)?")) {
-        characters = []; 
-        lockedCount = 0; 
-        currentSort = { field: null, direction: 'asc' };
-        quickNotes = ["", "", "", "", "", "", "", ""];
-        localStorage.setItem('mudaeQuickNotes', JSON.stringify(quickNotes));
-        document.getElementById('grid').innerHTML = '';
-        document.getElementById('commandsOutput').classList.add('hidden');
-        saveToLocalStorage();
-      }
+      showConfirmDialog(
+        "Clear Everything",
+        "Clear everything (harem, locks, output, AND quick note slots)?",
+        () => {
+          characters = [];
+          lockedCount = 0;
+          quickNotes = ["", "", "", "", "", "", "", ""];
+          localStorage.setItem('mudaeQuickNotes', JSON.stringify(quickNotes));
+          document.getElementById('grid').innerHTML = '';
+          document.getElementById('commandsOutput').classList.add('hidden');
+          saveToLocalStorage();
+          showToast("All data cleared.");
+        }
+      );
     }
 
     function goToTop() { lastScrollY = window.scrollY; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -1052,25 +1640,25 @@
     }
 
     function searchCharacter() {
-      let query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
       if (!query) return;
 
       const cards = Array.from(document.querySelectorAll('#grid > div'));
-      let bestCard = cards.find(card => {
-        const name = card.querySelector('.name-on-card').textContent.trim().toLowerCase();
+      const bestCard = cards.find(card => {
+        const name = (card.dataset.characterName || '').toLowerCase();
         return name === query || name.includes(query);
       }) || cards.find(card => {
-        const spEl = card.querySelectorAll('.text-\\[\\#57bb8a\\]')[1];
-        return spEl && spEl.textContent.toLowerCase().includes(query);
+        const sp = (card.dataset.characterSp || '').toLowerCase();
+        return sp.includes(query);
       }) || cards.find(card => {
-        const perkEl = card.querySelector('.text-xs');
-        return perkEl && perkEl.textContent.toLowerCase().includes(query);
+        const perks = (card.dataset.characterPerks || '').toLowerCase();
+        return perks.includes(query);
       }) || cards.find(card => {
-        const seriesEl = card.querySelector('.text-sm');
-        return seriesEl && seriesEl.textContent.toLowerCase().includes(query);
+        const series = (card.dataset.characterSeries || '').toLowerCase();
+        return series.includes(query);
       }) || cards.find(card => {
-        const noteEl = card.querySelector('.note-pill');
-        return noteEl && noteEl.textContent.toLowerCase().includes(query);
+        const note = (card.dataset.characterNote || '').toLowerCase();
+        return note.includes(query);
       });
 
       if (bestCard) {
@@ -1078,18 +1666,112 @@
         bestCard.style.boxShadow = '0 0 0 6px #57bb8a';
         setTimeout(() => bestCard.style.boxShadow = '', 2500);
       } else {
-        alert("No matching character, series, note or SP found.");
+        showToast("No matching character, series, note or SP found.");
       }
     }
 
-    function showHelp() { document.getElementById('helpBox').classList.remove('hidden'); }
-    function hideHelp() { document.getElementById('helpBox').classList.add('hidden'); }
+    function showHelp() { showModal('helpBox'); }
+    function hideHelp() { hideModal('helpBox'); }
+
+    function initModalOverlayHandlers() {
+      document.querySelectorAll('[data-overlay]').forEach(overlay => {
+        overlay.addEventListener('click', event => {
+          if (event.target === overlay) hideModal(overlay.id);
+        });
+      });
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       loadQuickNotes();
-      if (loadFromLocalStorage()) {
-        renderGrid();
-      }
+      loadFromLocalStorage();
+      renderGrid();
+      initSortable();
+      initModalOverlayHandlers();
+
+      document.getElementById('grid').addEventListener('click', handleGridClick);
+
+      document.getElementById('searchInput').addEventListener('keydown', event => {
+        if (event.key === 'Enter') searchCharacter();
+      });
+
+      document.getElementById('importBtn').addEventListener('click', showImportBox);
+      document.getElementById('loadBtn').addEventListener('click', showSaveImportBox);
+      document.getElementById('saveBtn').addEventListener('click', showSavePopup);
+      document.getElementById('notesBtn').addEventListener('click', openNotesModal);
+      document.getElementById('statsBtn').addEventListener('click', showStatsModal);
+      document.getElementById('generateBtn').addEventListener('click', generateCommands);
+      document.getElementById('clearBtn').addEventListener('click', clearAll);
+      document.getElementById('helpBtn').addEventListener('click', showHelp);
+
+      document.getElementById('gotoTopBtn').addEventListener('click', goToTop);
+      document.getElementById('gotoLockedBtn').addEventListener('click', goToBottomOfLocked);
+      document.getElementById('gotoBottomBtn').addEventListener('click', goToBottom);
+      document.getElementById('returnBtn').addEventListener('click', returnToLastPosition);
+      document.getElementById('jumpOutputBtn').addEventListener('click', jumpToOutput);
+
+      document.getElementById('sortNameBtn').addEventListener('click', sortByName);
+      document.getElementById('sortSeriesBtn').addEventListener('click', sortBySeries);
+      document.getElementById('sortKakeraBtn').addEventListener('click', sortByKakera);
+      document.getElementById('sortSpheresBtn').addEventListener('click', sortBySpheres);
+      document.getElementById('sortNoteBtn').addEventListener('click', sortByNote);
+      document.getElementById('shuffleBtn').addEventListener('click', shuffleUnlocked);
+      document.getElementById('unlockAllBtn').addEventListener('click', unlockAll);
+
+      document.getElementById('importConfirmBtn').addEventListener('click', performImport);
+      document.getElementById('importCancelBtn').addEventListener('click', hideImportBox);
+
+      document.getElementById('replaceListBtn').addEventListener('click', replaceList);
+      document.getElementById('mergeListBtn').addEventListener('click', addToBottom);
+      document.getElementById('choiceCancelBtn').addEventListener('click', hideChoiceModal);
+
+      document.getElementById('saveFileChooseBtn').addEventListener('click', () => document.getElementById('saveFileInput').click());
+      document.getElementById('saveFileInput').addEventListener('change', handleSaveFileUpload);
+      document.getElementById('savePasteImportBtn').addEventListener('click', importSaveFromPaste);
+      document.getElementById('saveImportCancelBtn').addEventListener('click', hideSaveImportBox);
+
+      document.getElementById('saveConfirmBtn').addEventListener('click', performSave);
+      document.getElementById('saveCancelBtn').addEventListener('click', hideSavePopup);
+
+      document.getElementById('imageUpdateConfirmBtn').addEventListener('click', applyImageUpdate);
+      document.getElementById('imageUpdateCancelBtn').addEventListener('click', hideImageModal);
+
+      document.getElementById('seriesConfirmBtn').addEventListener('click', confirmMoveSeriesToLocked);
+      document.getElementById('seriesCancelBtn').addEventListener('click', hideSeriesConfirmModal);
+
+      document.getElementById('quickNotesSetupBtn').addEventListener('click', openQuickNotesSetup);
+      document.getElementById('noteExportBtn').addEventListener('click', openNoteExportModal);
+      document.getElementById('clearNotesBtn').addEventListener('click', clearAllNotes);
+      document.getElementById('notesCancelBtn').addEventListener('click', hideNotesModal);
+
+      document.getElementById('saveQuickNotesBtn').addEventListener('click', saveQuickNotes);
+      document.getElementById('quickNotesCancelBtn').addEventListener('click', hideQuickNotesSetupModal);
+
+      document.getElementById('applyNoteBtn').addEventListener('click', applyNoteToCharacter);
+      document.getElementById('clearCurrentNoteBtn').addEventListener('click', clearCurrentNote);
+      document.getElementById('noteApplyCancelBtn').addEventListener('click', hideNoteApplyModal);
+
+      document.getElementById('generateNoteExportBtn').addEventListener('click', generateNoteExport);
+      document.getElementById('noteExportCancelBtn').addEventListener('click', hideNoteExportModal);
+
+      document.getElementById('statsCloseBtn').addEventListener('click', hideStatsModal);
+      document.getElementById('statsCloseBtnBottom').addEventListener('click', hideStatsModal);
+
+      document.getElementById('helpCloseBtn').addEventListener('click', hideHelp);
+      document.getElementById('helpCloseBtnBottom').addEventListener('click', hideHelp);
+
+      document.getElementById('confirmDialogAcceptBtn').addEventListener('click', confirmDialogAccept);
+      document.getElementById('confirmDialogCancelBtn').addEventListener('click', confirmDialogCancel);
+
+      document.addEventListener('click', event => {
+        if (event.target.matches('.copy-box-btn')) {
+          copyThisBox(event.target);
+        }
+      });
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeTopModal();
+      });
+
       showHelp();
     });
   </script>
